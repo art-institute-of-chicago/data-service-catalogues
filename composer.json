@@ -9,7 +9,8 @@
         "laravel/lumen-framework": "5.4.*",
         "vlucas/phpdotenv": "~2.2",
         "league/flysystem": "^1.0",
-        "graham-campbell/flysystem": "^4.0"
+        "graham-campbell/flysystem": "^4.0",
+        "league/fractal": "^0.17.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
