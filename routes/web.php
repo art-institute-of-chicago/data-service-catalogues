@@ -18,5 +18,7 @@ $app->get('/', function () use ($app) {
 
 $app->group(['prefix' => 'v1'], function() use ($app) {
 
+    $app->get('publications', 'PublicationController@index');
+    $app->get('publications/{id}', 'PublicationController@show');
 
 });
