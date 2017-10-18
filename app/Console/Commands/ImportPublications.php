@@ -96,7 +96,8 @@ class ImportPublications extends Command
 
         $contents = Flysystem::read( $file );
 
-        $crawler = new Crawler($contents);
+        $crawler = new Crawler();
+        $crawler->addHtmlContent( $contents, 'UTF-8' );
 
         // http://api.symfony.com/3.2/Symfony/Component/DomCrawler/Crawler.html
         // https://stackoverflow.com/questions/4858689/trouble-using-xpath-starts-with-to-parse-xhtml
@@ -128,7 +129,8 @@ class ImportPublications extends Command
             $file = "{$pub->site}/{$pub->id}/sections/{$id}.xhtml";
             $contents = Flysystem::read( $file );
 
-            $crawler = new Crawler( $contents );
+            $crawler = new Crawler();
+            $crawler->addHtmlContent( $contents, 'UTF-8' );
 
             $title = $crawler->filterXPath('html/head/title')->text();
             $title = trim( $title );
