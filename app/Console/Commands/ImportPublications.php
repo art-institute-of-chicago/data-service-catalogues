@@ -7,6 +7,7 @@ use GrahamCampbell\Flysystem\Facades\Flysystem;
 use Symfony\Component\DomCrawler\Crawler;
 
 use App\Publication;
+use App\Section;
 
 class ImportPublications extends Command
 {
@@ -147,15 +148,16 @@ class ImportPublications extends Command
 
             }
 
-            $sections[] = [
-                'id' => $id,
-                'title' => $title,
-                'revision' => $revision,
-                'parent_id' => $parent_id,
-                'publication_id' => $pub->id,
-            ];
+            // Save the Section to database
+            $section = Section::findOrNew( $id );
+            $section->id = $id;
+            $section->title = $title;
+            $section->revision = $revision;
+            $section->parent_id = $parent_id;
+            $section->publication_id = $pub->id;
+            $section->save();
 
-            // TODO: Actually save this Section data
+            $this->info("Imported Section #{$section->id}: '{$section->title}'");
 
         });
 
