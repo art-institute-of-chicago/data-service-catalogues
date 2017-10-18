@@ -132,10 +132,26 @@ class ImportPublications extends Command
             $title = $crawler->filterXPath('html/head/title')->text();
             $title = trim( $title );
 
+            // This will be either `nav` or an `li`
+            $parent = $item->parents()->eq(2);
+
+            if( $parent->nodeName() == 'li' ) {
+
+                // Get the id from the direct-descendant `a` tag
+                $parent_id = $parent->filterXPath('li/a')->attr('data-section_id');
+                $parent_id = (int) $parent_id;
+
+            } else {
+
+                $parent_id = null;
+
+            }
+
             $sections[] = [
                 'id' => $id,
                 'title' => $title,
                 'revision' => $revision,
+                'parent_id' => $parent_id,
                 'publication_id' => $pub->id,
             ];
 
