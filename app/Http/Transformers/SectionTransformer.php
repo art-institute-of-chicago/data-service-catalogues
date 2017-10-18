@@ -17,6 +17,7 @@ class SectionTransformer extends TransformerAbstract
             'revision' => $section->revision,
             'publication_id' => $section->publication_id,
             'parent_id' => $section->parent_id,
+            'child_ids' => $section->children()->pluck('id'),
         ];
 
     }

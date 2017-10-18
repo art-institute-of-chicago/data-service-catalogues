@@ -15,6 +15,7 @@ class PublicationTransformer extends TransformerAbstract
             'id' => $publication->id,
             'site' => $publication->site,
             'title' => $publication->title,
+            'section_ids' => $publication->sections()->pluck('id'),
         ];
 
     }
