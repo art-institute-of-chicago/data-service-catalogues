@@ -123,8 +123,18 @@ class ImportPublications extends Command
 
             $this->info("Downloaded {$url} to {$file}");
 
+            // Get the title from the downloaded content file
+            $file = "{$pub->site}/{$pub->id}/sections/{$id}.xhtml";
+            $contents = Flysystem::read( $file );
+
+            $crawler = new Crawler( $contents );
+
+            $title = $crawler->filterXPath('html/head/title')->text();
+            $title = trim( $title );
+
             $sections[] = [
                 'id' => $id,
+                'title' => $title,
                 'revision' => $revision,
                 'publication_id' => $pub->id,
             ];
