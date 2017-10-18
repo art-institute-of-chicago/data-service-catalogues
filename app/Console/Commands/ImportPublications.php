@@ -23,6 +23,8 @@ class ImportPublications extends Command
         $this->downloadPubs();
         $this->importPubs();
 
+        $this->downloadSections();
+
         $finish = microtime(TRUE);
         $totaltime = $finish - $start;
         $this->warn("Execution Time: {$totaltime} sec");
@@ -40,6 +42,20 @@ class ImportPublications extends Command
         $pubs = $this->getPubCollection();
 
         $pubs->each( [$this, 'downloadPub'] );
+
+    }
+
+    /**
+     * Downloads all sections.
+     *
+     * @return array
+     */
+    protected function downloadSections()
+    {
+
+        $pubs = $this->getPubCollection();
+
+        $pubs->each( [$this, 'downloadSectionsForPub'] );
 
     }
 
@@ -66,6 +82,59 @@ class ImportPublications extends Command
 
         $this->downloadPubPackage( $pub );
         $this->downloadPubNav( $pub );
+
+    }
+
+    /**
+     * Downloads sections listed in a publication's "Package Document" and saves them to storage.
+     */
+    public function downloadSectionsForPub( $pub )
+    {
+
+        $file = $pub->site . '/' . $pub->id . '/package.opf';
+
+        $contents = Flysystem::read( $file );
+
+        $crawler = new Crawler();
+        $crawler->setDefaultNamespacePrefix('opf');
+        $crawler->addXmlContent( $contents );
+
+        // http://api.symfony.com/3.2/Symfony/Component/DomCrawler/Crawler.html
+        // https://stackoverflow.com/questions/4858689/trouble-using-xpath-starts-with-to-parse-xhtml
+        $items = $crawler->filterXPath('opf:package/opf:manifest/opf:item[@id[starts-with(.,"section")]]');
+
+        $sections = [];
+
+        $items->each( function( $item ) use (&$sections, &$pub) {
+
+            $id = $item->attr( 'id' );
+            $id = substr( $id, 8 ); // remove 'section-'
+            $id = (int) $id;
+
+            $url = $item->attr( 'href' );
+
+            // https://stackoverflow.com/questions/11480763/how-to-get-parameters-from-a-url-string
+            parse_str( parse_url( $url, PHP_URL_QUERY ), $query );
+
+            $revision = (int) $query['revision'];
+
+            // Download the section
+            $contents = file_get_contents( $url );
+            $file = "{$pub->site}/{$pub->id}/sections/{$id}.xhtml";
+
+            Flysystem::put( $file, $contents );
+
+            $this->info("Downloaded {$url} to {$file}");
+
+            $sections[] = [
+                'id' => $id,
+                'revision' => $revision,
+                'publication_id' => $pub->id,
+            ];
+
+            // TODO: Actually save this Section data
+
+        });
 
     }
 
