@@ -86,29 +86,26 @@ class ImportPublications extends Command
     }
 
     /**
-     * Downloads sections listed in a publication's "Package Document" and saves them to storage.
+     * Downloads sections listed in a publication's "Nav Document" and saves them to storage.
      */
     public function downloadSectionsForPub( $pub )
     {
 
-        $file = $pub->site . '/' . $pub->id . '/package.opf';
+        $file = "{$pub->site}/{$pub->id}/nav.opf";
 
         $contents = Flysystem::read( $file );
 
-        $crawler = new Crawler();
-        $crawler->setDefaultNamespacePrefix('opf');
-        $crawler->addXmlContent( $contents );
+        $crawler = new Crawler($contents);
 
         // http://api.symfony.com/3.2/Symfony/Component/DomCrawler/Crawler.html
         // https://stackoverflow.com/questions/4858689/trouble-using-xpath-starts-with-to-parse-xhtml
-        $items = $crawler->filterXPath('opf:package/opf:manifest/opf:item[@id[starts-with(.,"section")]]');
+        $items = $crawler->filterXPath("//a[@data-section_id]");
 
         $sections = [];
 
         $items->each( function( $item ) use (&$sections, &$pub) {
 
-            $id = $item->attr( 'id' );
-            $id = substr( $id, 8 ); // remove 'section-'
+            $id = $item->attr( 'data-section_id' );
             $id = (int) $id;
 
             $url = $item->attr( 'href' );
