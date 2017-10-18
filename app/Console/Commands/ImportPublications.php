@@ -18,8 +18,14 @@ class ImportPublications extends Command
     public function handle()
     {
 
+        $start = microtime(TRUE);
+
         $this->downloadPubs();
         $this->importPubs();
+
+        $finish = microtime(TRUE);
+        $totaltime = $finish - $start;
+        $this->warn("Execution Time: {$totaltime} sec");
 
     }
 
