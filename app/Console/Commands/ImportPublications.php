@@ -4,6 +4,9 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use GrahamCampbell\Flysystem\Facades\Flysystem;
+use Symfony\Component\DomCrawler\Crawler;
+
+use App\Publication;
 
 class ImportPublications extends Command
 {
@@ -16,6 +19,7 @@ class ImportPublications extends Command
     {
 
         $this->downloadPubs();
+        $this->importPubs();
 
     }
 
@@ -30,6 +34,18 @@ class ImportPublications extends Command
         $pubs = $this->getPubCollection();
 
         $pubs->each( [$this, 'downloadPub'] );
+
+    }
+
+    /**
+     * Imports previously downloaded publications into the database.
+     */
+    protected function importPubs()
+    {
+
+        $pubs = $this->getPubCollection();
+
+        $pubs->each( [$this, 'importPub'] );
 
     }
 
@@ -65,7 +81,6 @@ class ImportPublications extends Command
 
     }
 
-
     /**
      * Downloads a publication's "Package Document" and saves it to storage.
      *
@@ -81,6 +96,36 @@ class ImportPublications extends Command
         Flysystem::put( $file, $contents );
 
         $this->info("Downloaded {$url} to {$file}");
+
+    }
+
+    /**
+     * Imports a publication using a previously downloaded "Package Document"
+     *
+     * @return \App\Publication
+     */
+    public function importPub( $pub )
+    {
+
+        $file = $pub->site . '/' . $pub->id . '/package.opf';
+
+        $contents = Flysystem::read( $file );
+
+        $crawler = new Crawler();
+        $crawler->setDefaultNamespacePrefix('opf'); // http://www.idpf.org/2007/opf
+        $crawler->addXmlContent( $contents );
+
+        // https://symfony.com/doc/current/components/dom_crawler.html
+        $title = $crawler->filterXPath('opf:package/opf:metadata/dc:title')->text();
+        $title = trim( $title );
+
+        $publication = Publication::findOrNew( $pub->id );
+        $publication->id = $pub->id;
+        $publication->site = $pub->site;
+        $publication->title = $title;
+        $publication->save();
+
+        $this->info("Imported Publication #{$publication->id}: '{$publication->title}'");
 
     }
 
