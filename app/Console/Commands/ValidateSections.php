@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use GrahamCampbell\Flysystem\Facades\Flysystem;
 
-use App\Publication;
 use App\Section;
 
 class ValidateSections extends AbstractCommand
@@ -23,7 +22,12 @@ class ValidateSections extends AbstractCommand
 
         $pubs->each( [$this, 'getSections'] );
 
-        return $this->countConflicts();
+        $conflicts = $this->countConflicts();
+
+        $this->info('Total Sections Downloaded: ' . count( $this->sections ) );
+        $this->info('Total Sections in Database: ' . Section::count() );
+
+        return $conflicts;
 
     }
 
@@ -47,25 +51,54 @@ class ValidateSections extends AbstractCommand
     public function countConflicts()
     {
 
-        $conflicts = 0;
+        $collates = [];
 
+        // Group publication ids by section id
         foreach( $this->sections as $i ) {
 
-            $matches = [];
+            $collated = false;
 
-            foreach( $this->sections as $j ) {
+            foreach( $collates as &$j ) {
 
-                if( $i['section_id'] === $j['section_id'] ) {
-
-                    $matches[] = $j['publication_id'];
-
+                if( $j['section_id'] === $i['section_id'] ) {
+                    $j['publication_ids'][] = $i['publication_id'];
+                    $collated = true;
                 }
 
             }
 
-            if( count( $matches ) > 1 ) {
+            if( !$collated ) {
 
-                $this->info( 'Section #' . $i['section_id'] . ' occurs in ' . count($matches) . ' publications: ' . implode(', ', $matches) );
+                $collates[] = [
+                    'section_id' => $i['section_id'],
+                    'publication_ids' => [
+                        $i['publication_id']
+                    ]
+                ];
+
+            }
+
+        }
+
+        // Filter out items which have only one publication listed
+        $matches = array_filter( $collates, function( $j ) {
+            return count( $j['publication_ids'] ) > 1;
+        });
+
+        // Sort by section id, ascending
+        usort( $matches, function( $a, $b ) {
+            return ($a['section_id'] < $b['section_id']) ? -1 : 1;
+        });
+
+
+        // Figure out number of conflicts
+        $conflicts = 0;
+
+        foreach( $matches as $i ) {
+
+            if( count( $i['publication_ids'] ) > 1 ) {
+
+                $this->info( 'Section #' . $i['section_id'] . ' occurs in ' . count($i['publication_ids']) . ' publications: ' . implode(', ', $i['publication_ids']) );
 
                 $conflicts++;
 
