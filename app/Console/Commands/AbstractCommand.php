@@ -1,0 +1,156 @@
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+abstract class AbstractCommand extends Command
+{
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    abstract public function handle();
+
+    /**
+     * Here, we've extended the inherited execute method, which allows us to log times
+     * for each command call. You can use `handle` in child classes as normal.
+     *
+     * @link http://api.symfony.com/3.3/Symfony/Component/Console/Command/Command.html
+     * @link https://github.com/laravel/framework/blob/5.4/src/Illuminate/Console/Command.php
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return mixed
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+
+        $start = microtime(TRUE);
+
+        // Call Illuminate\Console\Command::execute
+        $result = parent::execute( $input, $output );
+
+        $finish = microtime(TRUE);
+        $totaltime = $finish - $start;
+        $this->warn("Execution Time: {$totaltime} sec");
+
+        return $result;
+
+    }
+
+    /**
+     * Returns link to a publication's "Package Document"
+     *
+     * @param object $pub
+     * @return string
+     */
+    protected function getPackageUrl( $pub )
+    {
+        return 'https://publications.artic.edu/' . $pub->site . '/api/epub/' . $pub->id . '/package.opf';
+    }
+
+    /**
+     * Returns path to a publication's downloaded "Package Document"
+     *
+     * @param object $pub
+     * @return string
+     */
+    protected function getPackagePath( $pub )
+    {
+        return $pub->site . '/' . $pub->id . '/package.opf';
+    }
+
+    /**
+     * Returns link to a publication's "Nav Document"
+     *
+     * @param object $pub
+     * @return string
+     */
+    protected function getNavUrl( $pub )
+    {
+        return 'https://publications.artic.edu/' . $pub->site . '/api/epub/' . $pub->id . '/nav.xhtml';
+    }
+
+    /**
+     * Returns path to a publication's downloaded "Nav Document"
+     *
+     * @param object $pub
+     * @return string
+     */
+    protected function getNavPath( $pub )
+    {
+        return $pub->site . '/' . $pub->id . '/nav.xhtml';
+    }
+
+    /**
+     * Returns necessary config for importing publications. Edit this method to target specific pubs for processing.
+     * Publication list has to be hardcoded to avoid importing test publications. Each pub is an object.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getPubCollection()
+    {
+
+        $pubs = [
+            [
+                'site' => 'renoir',
+                'id' => '135446',
+            ],
+            [
+                'site' => 'monet',
+                'id' => '135466',
+            ],
+            [
+                'site' => 'ensor',
+                'id' => '226',
+            ],
+            [
+                'site' => 'pissarro',
+                'id' => '7',
+            ],
+            [
+                'site' => 'whistler',
+                'id' => '406',
+            ],
+            [
+                'site' => 'caillebotte',
+                'id' => '445',
+            ],
+            [
+                'site' => 'gauguin',
+                'id' => '141096',
+            ],
+            [
+                'site' => 'modernseries',
+                'id' => '12',
+            ],
+            [
+                'site' => 'roman',
+                'id' => '480',
+            ],
+            [
+                'site' => 'manet',
+                'id' => '140019',
+            ],
+        ];
+
+        // Convert into Laravel Collection
+        $pubs = collect( $pubs );
+
+        // Convert the assoc. arrays into stdObj
+        $pubs->transform( function ($item, $key) {
+            return (object) $item;
+        });
+
+        return $pubs;
+
+    }
+
+}
+
+
