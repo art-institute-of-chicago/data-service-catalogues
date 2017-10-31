@@ -44,6 +44,17 @@ abstract class AbstractCommand extends Command
     }
 
     /**
+     * Returns path to a publication's directory in storage
+     *
+     * @param object $pub
+     * @return string
+     */
+    protected function getPubPath( $pub )
+    {
+        return $pub->site . '/' . $pub->id;
+    }
+
+    /**
      * Returns link to a publication's "Package Document"
      *
      * @param object $pub
@@ -62,7 +73,7 @@ abstract class AbstractCommand extends Command
      */
     protected function getPackagePath( $pub )
     {
-        return $pub->site . '/' . $pub->id . '/package.opf';
+        return $this->getPubPath( $pub ) . '/package.opf';
     }
 
     /**
@@ -84,7 +95,7 @@ abstract class AbstractCommand extends Command
      */
     protected function getNavPath( $pub )
     {
-        return $pub->site . '/' . $pub->id . '/nav.xhtml';
+        return $this->getPubPath( $pub ) . '/nav.xhtml';
     }
 
     /**

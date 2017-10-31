@@ -112,7 +112,7 @@ class ImportPublications extends AbstractCommand
             $revision = (int) $query['revision'];
 
             // Download the section
-            $file = "{$pub->site}/{$pub->id}/sections/{$id}.xhtml";
+            $file = $this->getPubPath( $pub ) . "/sections/{$id}.xhtml";
 
             if( !Flysystem::has( $file ) || $this->option('redownload') )
             {
@@ -126,7 +126,7 @@ class ImportPublications extends AbstractCommand
 
             // Get the title from the downloaded content file
             // TODO: Get title from the nav instead?
-            $file = "{$pub->site}/{$pub->id}/sections/{$id}.xhtml";
+            $file = $this->getPubPath( $pub ) . "/sections/{$id}.xhtml";
             $contents = Flysystem::read( $file );
 
             $crawler = new Crawler();
