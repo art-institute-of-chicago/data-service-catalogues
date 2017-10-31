@@ -12,7 +12,7 @@ use App\Section;
 class ImportPublications extends Command
 {
 
-    protected $signature = 'import:pubs';
+    protected $signature = 'import:pubs {--redownload : Re-scrape, instead of using previously-downloaded files}';
 
     protected $description = "Import all configured publications";
 
@@ -118,14 +118,20 @@ class ImportPublications extends Command
             $revision = (int) $query['revision'];
 
             // Download the section
-            $contents = file_get_contents( $url );
             $file = "{$pub->site}/{$pub->id}/sections/{$id}.xhtml";
 
-            Flysystem::put( $file, $contents );
+            if( !Flysystem::has( $file ) || $this->option('redownload') )
+            {
 
-            $this->info("Downloaded {$url} to {$file}");
+                $contents = file_get_contents( $url );
+                Flysystem::put( $file, $contents );
+
+                $this->warn("Downloaded {$url} to {$file}");
+
+            }
 
             // Get the title from the downloaded content file
+            // TODO: Get title from the nav instead?
             $file = "{$pub->site}/{$pub->id}/sections/{$id}.xhtml";
             $contents = Flysystem::read( $file );
 
@@ -173,13 +179,19 @@ class ImportPublications extends Command
     public function downloadPubPackage( $pub )
     {
 
-        $url = $this->getPackageUrl( $pub );
-        $contents = file_get_contents( $url );
         $file = $pub->site . '/' . $pub->id . '/package.opf';
 
-        Flysystem::put( $file, $contents );
+        if( !Flysystem::has( $file ) || $this->option('redownload') )
+        {
 
-        $this->info("Downloaded {$url} to {$file}");
+            $url = $this->getPackageUrl( $pub );
+            $contents = file_get_contents( $url );
+
+            Flysystem::put( $file, $contents );
+
+            $this->warn("Downloaded {$url} to {$file}");
+
+        }
 
     }
 
@@ -191,13 +203,19 @@ class ImportPublications extends Command
     public function downloadPubNav( $pub )
     {
 
-        $url = $this->getNavUrl( $pub );
-        $contents = file_get_contents( $url );
         $file = $pub->site . '/' . $pub->id . '/nav.opf';
 
-        Flysystem::put( $file, $contents );
+        if( !Flysystem::has( $file ) || $this->option('redownload') )
+        {
 
-        $this->info("Downloaded {$url} to {$file}");
+            $url = $this->getNavUrl( $pub );
+            $contents = file_get_contents( $url );
+
+            Flysystem::put( $file, $contents );
+
+            $this->warn("Downloaded {$url} to {$file}");
+
+        }
 
     }
 
