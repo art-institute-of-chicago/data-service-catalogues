@@ -7,6 +7,7 @@ use GrahamCampbell\Flysystem\Facades\Flysystem;
 use Symfony\Component\DomCrawler\Crawler;
 
 use App\Publication;
+use App\Section;
 
 class ImportPublications extends Command
 {
@@ -22,6 +23,8 @@ class ImportPublications extends Command
 
         $this->downloadPubs();
         $this->importPubs();
+
+        $this->downloadSections();
 
         $finish = microtime(TRUE);
         $totaltime = $finish - $start;
@@ -40,6 +43,20 @@ class ImportPublications extends Command
         $pubs = $this->getPubCollection();
 
         $pubs->each( [$this, 'downloadPub'] );
+
+    }
+
+    /**
+     * Downloads all sections.
+     *
+     * @return array
+     */
+    protected function downloadSections()
+    {
+
+        $pubs = $this->getPubCollection();
+
+        $pubs->each( [$this, 'downloadSectionsForPub'] );
 
     }
 
@@ -66,6 +83,85 @@ class ImportPublications extends Command
 
         $this->downloadPubPackage( $pub );
         $this->downloadPubNav( $pub );
+
+    }
+
+    /**
+     * Downloads sections listed in a publication's "Nav Document" and saves them to storage.
+     */
+    public function downloadSectionsForPub( $pub )
+    {
+
+        $file = "{$pub->site}/{$pub->id}/nav.opf";
+
+        $contents = Flysystem::read( $file );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent( $contents, 'UTF-8' );
+
+        // http://api.symfony.com/3.2/Symfony/Component/DomCrawler/Crawler.html
+        // https://stackoverflow.com/questions/4858689/trouble-using-xpath-starts-with-to-parse-xhtml
+        $items = $crawler->filterXPath("//a[@data-section_id]");
+
+        $sections = [];
+
+        $items->each( function( $item ) use (&$sections, &$pub) {
+
+            $id = $item->attr( 'data-section_id' );
+            $id = (int) $id;
+
+            $url = $item->attr( 'href' );
+
+            // https://stackoverflow.com/questions/11480763/how-to-get-parameters-from-a-url-string
+            parse_str( parse_url( $url, PHP_URL_QUERY ), $query );
+
+            $revision = (int) $query['revision'];
+
+            // Download the section
+            $contents = file_get_contents( $url );
+            $file = "{$pub->site}/{$pub->id}/sections/{$id}.xhtml";
+
+            Flysystem::put( $file, $contents );
+
+            $this->info("Downloaded {$url} to {$file}");
+
+            // Get the title from the downloaded content file
+            $file = "{$pub->site}/{$pub->id}/sections/{$id}.xhtml";
+            $contents = Flysystem::read( $file );
+
+            $crawler = new Crawler();
+            $crawler->addHtmlContent( $contents, 'UTF-8' );
+
+            $title = $crawler->filterXPath('html/head/title')->text();
+            $title = trim( $title );
+
+            // This will be either `nav` or an `li`
+            $parent = $item->parents()->eq(2);
+
+            if( $parent->nodeName() == 'li' ) {
+
+                // Get the id from the direct-descendant `a` tag
+                $parent_id = $parent->filterXPath('li/a')->attr('data-section_id');
+                $parent_id = (int) $parent_id;
+
+            } else {
+
+                $parent_id = null;
+
+            }
+
+            // Save the Section to database
+            $section = Section::findOrNew( $id );
+            $section->id = $id;
+            $section->title = $title;
+            $section->revision = $revision;
+            $section->parent_id = $parent_id;
+            $section->publication_id = $pub->id;
+            $section->save();
+
+            $this->info("Imported Section #{$section->id}: '{$section->title}'");
+
+        });
 
     }
 
