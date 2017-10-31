@@ -101,8 +101,8 @@ class ImportPublications extends AbstractCommand
 
         $items->each( function( $item ) use (&$sections, &$pub) {
 
-            $id = $item->attr( 'data-section_id' );
-            $id = (int) $id;
+            $source_id = (int) $item->attr( 'data-section_id' );
+            $cantor_id = self::cantor_pair_calculate( $pub->id, $source_id );
 
             $url = $item->attr( 'href' );
 
@@ -112,7 +112,7 @@ class ImportPublications extends AbstractCommand
             $revision = (int) $query['revision'];
 
             // Download the section
-            $file = $this->getPubPath( $pub ) . "/sections/{$id}.xhtml";
+            $file = $this->getPubPath( $pub ) . "/sections/{$source_id}.xhtml";
 
             if( !Flysystem::has( $file ) || $this->option('redownload') )
             {
@@ -126,7 +126,7 @@ class ImportPublications extends AbstractCommand
 
             // Get the title from the downloaded content file
             // TODO: Get title from the nav instead?
-            $file = $this->getPubPath( $pub ) . "/sections/{$id}.xhtml";
+            $file = $this->getPubPath( $pub ) . "/sections/{$source_id}.xhtml";
             $contents = Flysystem::read( $file );
 
             $crawler = new Crawler();
@@ -144,6 +144,8 @@ class ImportPublications extends AbstractCommand
                 $parent_id = $parent->filterXPath('li/a')->attr('data-section_id');
                 $parent_id = (int) $parent_id;
 
+                $parent_id = self::cantor_pair_calculate( $pub->id, $parent_id );
+
             } else {
 
                 $parent_id = null;
@@ -151,10 +153,11 @@ class ImportPublications extends AbstractCommand
             }
 
             // Save the Section to database
-            $section = Section::findOrNew( $id );
-            $section->id = $id;
+            $section = Section::findOrNew( $cantor_id );
+            $section->id = $cantor_id;
             $section->title = $title;
             $section->revision = $revision;
+            $section->source_id = $source_id;
             $section->parent_id = $parent_id;
             $section->publication_id = $pub->id;
             $section->save();
