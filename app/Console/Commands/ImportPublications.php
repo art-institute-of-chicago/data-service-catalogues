@@ -92,7 +92,7 @@ class ImportPublications extends Command
     public function downloadSectionsForPub( $pub )
     {
 
-        $file = "{$pub->site}/{$pub->id}/nav.opf";
+        $file = $this->getNavPath( $pub );
 
         $contents = Flysystem::read( $file );
 
@@ -179,7 +179,7 @@ class ImportPublications extends Command
     public function downloadPubPackage( $pub )
     {
 
-        $file = $pub->site . '/' . $pub->id . '/package.opf';
+        $file = $this->getPackagePath( $pub );
 
         if( !Flysystem::has( $file ) || $this->option('redownload') )
         {
@@ -203,7 +203,7 @@ class ImportPublications extends Command
     public function downloadPubNav( $pub )
     {
 
-        $file = $pub->site . '/' . $pub->id . '/nav.opf';
+        $file = $this->getNavPath( $pub );
 
         if( !Flysystem::has( $file ) || $this->option('redownload') )
         {
@@ -227,7 +227,7 @@ class ImportPublications extends Command
     public function importPub( $pub )
     {
 
-        $file = $pub->site . '/' . $pub->id . '/package.opf';
+        $file = $this->getPackagePath( $pub );
 
         $contents = Flysystem::read( $file );
 
@@ -261,6 +261,17 @@ class ImportPublications extends Command
     }
 
     /**
+     * Returns path to a publication's downloaded "Package Document"
+     *
+     * @param object $pub
+     * @return string
+     */
+    protected function getPackagePath( $pub )
+    {
+        return $pub->site . '/' . $pub->id . '/package.opf';
+    }
+
+    /**
      * Returns link to a publication's "Nav Document"
      *
      * @param object $pub
@@ -269,6 +280,17 @@ class ImportPublications extends Command
     protected function getNavUrl( $pub )
     {
         return 'https://publications.artic.edu/' . $pub->site . '/api/epub/' . $pub->id . '/nav.xhtml';
+    }
+
+    /**
+     * Returns path to a publication's downloaded "Nav Document"
+     *
+     * @param object $pub
+     * @return string
+     */
+    protected function getNavPath( $pub )
+    {
+        return $pub->site . '/' . $pub->id . '/nav.xhtml';
     }
 
     /**
