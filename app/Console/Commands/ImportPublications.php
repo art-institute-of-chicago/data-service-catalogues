@@ -9,7 +9,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use App\Publication;
 use App\Section;
 
-class ImportPublications extends Command
+class ImportPublications extends AbstractCommand
 {
 
     protected $signature = 'import:pubs {--redownload : Re-scrape, instead of using previously-downloaded files}';
@@ -19,16 +19,10 @@ class ImportPublications extends Command
     public function handle()
     {
 
-        $start = microtime(TRUE);
-
         $this->downloadPubs();
         $this->importPubs();
 
         $this->downloadSections();
-
-        $finish = microtime(TRUE);
-        $totaltime = $finish - $start;
-        $this->warn("Execution Time: {$totaltime} sec");
 
     }
 
@@ -92,7 +86,7 @@ class ImportPublications extends Command
     public function downloadSectionsForPub( $pub )
     {
 
-        $file = "{$pub->site}/{$pub->id}/nav.opf";
+        $file = $this->getNavPath( $pub );
 
         $contents = Flysystem::read( $file );
 
@@ -107,8 +101,8 @@ class ImportPublications extends Command
 
         $items->each( function( $item ) use (&$sections, &$pub) {
 
-            $id = $item->attr( 'data-section_id' );
-            $id = (int) $id;
+            $source_id = (int) $item->attr( 'data-section_id' );
+            $cantor_id = self::cantor_pair_calculate( $pub->id, $source_id );
 
             $url = $item->attr( 'href' );
 
@@ -118,7 +112,7 @@ class ImportPublications extends Command
             $revision = (int) $query['revision'];
 
             // Download the section
-            $file = "{$pub->site}/{$pub->id}/sections/{$id}.xhtml";
+            $file = $this->getPubPath( $pub ) . "/sections/{$source_id}.xhtml";
 
             if( !Flysystem::has( $file ) || $this->option('redownload') )
             {
@@ -132,7 +126,7 @@ class ImportPublications extends Command
 
             // Get the title from the downloaded content file
             // TODO: Get title from the nav instead?
-            $file = "{$pub->site}/{$pub->id}/sections/{$id}.xhtml";
+            $file = $this->getPubPath( $pub ) . "/sections/{$source_id}.xhtml";
             $contents = Flysystem::read( $file );
 
             $crawler = new Crawler();
@@ -150,6 +144,8 @@ class ImportPublications extends Command
                 $parent_id = $parent->filterXPath('li/a')->attr('data-section_id');
                 $parent_id = (int) $parent_id;
 
+                $parent_id = self::cantor_pair_calculate( $pub->id, $parent_id );
+
             } else {
 
                 $parent_id = null;
@@ -157,10 +153,11 @@ class ImportPublications extends Command
             }
 
             // Save the Section to database
-            $section = Section::findOrNew( $id );
-            $section->id = $id;
+            $section = Section::findOrNew( $cantor_id );
+            $section->id = $cantor_id;
             $section->title = $title;
             $section->revision = $revision;
+            $section->source_id = $source_id;
             $section->parent_id = $parent_id;
             $section->publication_id = $pub->id;
             $section->save();
@@ -179,7 +176,7 @@ class ImportPublications extends Command
     public function downloadPubPackage( $pub )
     {
 
-        $file = $pub->site . '/' . $pub->id . '/package.opf';
+        $file = $this->getPackagePath( $pub );
 
         if( !Flysystem::has( $file ) || $this->option('redownload') )
         {
@@ -203,7 +200,7 @@ class ImportPublications extends Command
     public function downloadPubNav( $pub )
     {
 
-        $file = $pub->site . '/' . $pub->id . '/nav.opf';
+        $file = $this->getNavPath( $pub );
 
         if( !Flysystem::has( $file ) || $this->option('redownload') )
         {
@@ -227,7 +224,7 @@ class ImportPublications extends Command
     public function importPub( $pub )
     {
 
-        $file = $pub->site . '/' . $pub->id . '/package.opf';
+        $file = $this->getPackagePath( $pub );
 
         $contents = Flysystem::read( $file );
 
@@ -246,92 +243,6 @@ class ImportPublications extends Command
         $publication->save();
 
         $this->info("Imported Publication #{$publication->id}: '{$publication->title}'");
-
-    }
-
-    /**
-     * Returns link to a publication's "Package Document"
-     *
-     * @param object $pub
-     * @return string
-     */
-    protected function getPackageUrl( $pub )
-    {
-        return 'https://publications.artic.edu/' . $pub->site . '/api/epub/' . $pub->id . '/package.opf';
-    }
-
-    /**
-     * Returns link to a publication's "Nav Document"
-     *
-     * @param object $pub
-     * @return string
-     */
-    protected function getNavUrl( $pub )
-    {
-        return 'https://publications.artic.edu/' . $pub->site . '/api/epub/' . $pub->id . '/nav.xhtml';
-    }
-
-    /**
-     * Returns necessary config for importing publications. Edit this method to target specific pubs for processing.
-     * Publication list has to be hardcoded to avoid importing test publications. Each pub is an object.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function getPubCollection()
-    {
-
-        $pubs = [
-            [
-                'site' => 'renoir',
-                'id' => '135446',
-            ],
-            [
-                'site' => 'monet',
-                'id' => '135466',
-            ],
-            [
-                'site' => 'ensor',
-                'id' => '226',
-            ],
-            [
-                'site' => 'pissarro',
-                'id' => '7',
-            ],
-            [
-                'site' => 'whistler',
-                'id' => '406',
-            ],
-            [
-                'site' => 'caillebotte',
-                'id' => '445',
-            ],
-            [
-                'site' => 'gauguin',
-                'id' => '141096',
-            ],
-            [
-                'site' => 'modernseries',
-                'id' => '12',
-            ],
-            [
-                'site' => 'roman',
-                'id' => '480',
-            ],
-            [
-                'site' => 'manet',
-                'id' => '140019',
-            ],
-        ];
-
-        // Convert into Laravel Collection
-        $pubs = collect( $pubs );
-
-        // Convert the assoc. arrays into stdObj
-        $pubs->transform( function ($item, $key) {
-            return (object) $item;
-        });
-
-        return $pubs;
 
     }
 

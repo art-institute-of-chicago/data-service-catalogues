@@ -15,9 +15,10 @@ class Sections extends Migration
     {
 
         Schema::create('sections', function (Blueprint $table) {
-            $table->integer('id')->unsigned()->primary();
+            $table->bigInteger('id')->unsigned()->primary();
             $table->string('title')->nullable();
             $table->integer('revision')->nullable();
+            $table->integer('source_id')->nullable()->index();
             $table->integer('publication_id')->nullable()->unsigned()->index();
             $table->foreign('publication_id')->references('id')->on('publications')->onDelete('cascade');
             $table->timestamps();
@@ -25,7 +26,7 @@ class Sections extends Migration
 
         // Because these are self-referential, the table must be created first
         Schema::table('sections', function (Blueprint $table) {
-            $table->integer('parent_id')->nullable()->unsigned()->index();
+            $table->bigInteger('parent_id')->nullable()->unsigned()->index();
             $table->foreign('parent_id')->references('id')->on('sections')->onDelete('cascade');
         });
 
