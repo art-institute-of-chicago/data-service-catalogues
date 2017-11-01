@@ -24,4 +24,7 @@ $app->group(['prefix' => 'v1'], function() use ($app) {
     $app->get('sections', 'SectionController@index');
     $app->get('sections/{id}', 'SectionController@show');
 
+    $app->get('publications/{id}/sections', 'SectionController@indexForPublication');
+    $app->get('publications/{publication_id}/sections/{id}', 'SectionController@showForPublication');
+
 });
