@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
+use Illuminate\Support\Facades\Input;
+use Closure;
+
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
-
-use App\Http\Transformers\ApiSerializer;
 
 use Laravel\Lumen\Routing\Controller as BaseController;
 
@@ -27,19 +28,86 @@ class Controller extends BaseController
     public function __construct(Manager $fractal)
     {
         $this->fractal = $fractal;
-        // $fractal->setSerializer(new ApiSerializer);
     }
 
     const LIMIT_MAX = 1000;
 
-
     /**
      * Display the specified resource.
      *
-     * @param null $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  mixed $id
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request, $id)
+    {
+
+        return $this->select( $request, function( $id ) {
+
+            return $this->find($id);
+
+        });
+
+    }
+
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
+    {
+
+        return $this->collect( $request, function( $limit ) {
+
+            return $this->paginate( $limit );
+
+        });
+
+    }
+
+
+    /**
+     * Call to find specific id(s). Override this method when logic to get
+     * a model is more complex than a simple `$model::find($id)` call.
+     *
+     * @param mixed $ids
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    protected function find($ids)
+    {
+
+        return ($this->model)::find($ids);
+
+    }
+
+
+    /**
+     * Call to get a model list. Override this method when logic to get
+     * models is more complex than a simple `$model::paginate($limit)` call.
+     *
+     * @param int $limit
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    protected function paginate($limit)
+    {
+
+        return ($this->model)::paginate($limit);
+
+    }
+
+
+    /**
+     * Return a single resource. Not meant to be called directly in routes.
+     * `$callback` should return an Eloquent Model.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure $callback
+     * @return \Illuminate\Http\Response
+     */
+    protected function select( Request $request, Closure $callback )
     {
 
         // Technically this will never be called, b/c we only bind Route.get
@@ -48,13 +116,16 @@ class Controller extends BaseController
             return $this->respondMethodNotAllowed();
         }
 
-        // Only allow numeric ids
-        if (intval($id) <= 0)
+        // https://github.com/laravel/lumen-framework/issues/119
+        $id = $request->route()[2]['id'] ?? null;
+
+        if (!$this->validateId( $id ))
         {
             return $this->respondInvalidSyntax();
         }
 
-        $item = $this->find($id);
+        // TODO: Improve exception handling via Handler
+        $item = $callback( $id );
 
         if (!$item)
         {
@@ -67,23 +138,14 @@ class Controller extends BaseController
 
 
     /**
-     * Call to find models. Override this method when logic to retieve models
-     * is more complex than a simple `$model->find($id)` call.
-     */
-    public function find($ids)
-    {
-
-        return ($this->model)::find($ids);
-
-    }
-
-
-    /**
-     * Display a listing of the resource.
+     * Return a list of resources. Not meant to be called directly in routes.
+     * `$callback` should return an Eloquent Collection.
      *
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure $callback
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    protected function collect( Request $request, Closure $callback )
     {
 
         // Technically this will never be called, b/c we only bind Route.get
@@ -108,8 +170,12 @@ class Controller extends BaseController
             return $this->respondBigLimit();
         }
 
+        // This would happen for subresources
+        // https://github.com/laravel/lumen-framework/issues/119
+        $id = $request->route()[2]['id'] ?? null;
+
         // Assumes the inheriting class set model and transformer
-        $all = ($this->model)::paginate($limit);
+        $all = $callback( $limit, $id );
 
         return $this->collection($all, new $this->transformer);
 
@@ -132,6 +198,17 @@ class Controller extends BaseController
             return $this->respondTooManyIds();
         }
 
+        // Validate the syntax for each $id
+        foreach( $ids as $id )
+        {
+
+            if (!$this->validateId( $id ))
+            {
+                return $this->respondInvalidSyntax();
+            }
+
+        }
+
         $all = $this->find($ids);
 
         return $this->collection($all, new $this->transformer);
@@ -139,6 +216,34 @@ class Controller extends BaseController
     }
 
 
+    /**
+     * Validate `id` route or query string param format. By default, only
+     * numeric ids greater than zero are accepted. Override this method in
+     * child classes to implement different validation rules (e.g. UUID).
+     *
+     * @TODO Move this logic to the base model classes?
+     *
+     * @param mixed $id
+     * @return boolean
+     */
+    protected function validateId( $id )
+    {
+
+        // By default, only allow numeric ids greater than 0
+        return is_numeric($id) && intval($id) > 0;
+
+    }
+
+
+    /**
+     * Helper method that transforms a paginated collection of model instances using Fractal and returns it as a response.
+     * In Laravel, we would define this as a response macro.
+     *
+     * @param array $model \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @param array $transformer \League\Fractal\TransformerAbstract
+     *
+     * @return \Illuminate\Http\Response
+     */
     private function collection($all, $transformer)
     {
 
@@ -160,6 +265,7 @@ class Controller extends BaseController
             if ($all->previousPageUrl()) {
                 $paginator['prev_url'] = $all->previousPageUrl() .'&limit=' .$all->perPage();
             }
+
             if ($all->hasMorePages()) {
                 $paginator['next_url'] = $all->nextPageUrl() .'&limit=' .$all->perPage();
             }
@@ -173,10 +279,19 @@ class Controller extends BaseController
     }
 
 
-    private function item($event, $transformer)
+    /**
+     * Helper method that transforms a model instance using Fractal and returns it as a response.
+     * In Laravel, we would define this as a response macro.
+     *
+     * @param array $model \Illuminate\Database\Eloquent\Model
+     * @param array $transformer \League\Fractal\TransformerAbstract
+     *
+     * @return \Illuminate\Http\Response
+     */
+    private function item($model, $transformer)
     {
 
-        $item = new Item($event, $transformer);
+        $item = new Item($model, $transformer);
 
         $data = $this->fractal->createData($item)->toArray();
 
