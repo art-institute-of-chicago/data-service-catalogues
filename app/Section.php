@@ -135,27 +135,27 @@ class Section extends BaseModel
         // TODO: Everything below here is cleanup stuff that should be abstracted elsewhere
 
         // Remove all anchor tags
-        // $crawler->filterXPath('//a')->each( function( Crawler $subcrawler ) {
-        //     foreach ($subcrawler as $node) {
-        //         $node->parentNode->removeChild($node);
-        //     }
-        // });
+        $crawler->filterXPath('//a')->each( function( Crawler $subcrawler ) {
+            foreach ($subcrawler as $node) {
+                $node->parentNode->removeChild($node);
+            }
+        });
 
         $html = $crawler->html();
-        // $html = trim($html);
+        $html = trim($html);
 
         $converter = new HtmlConverter();
         $markdown = $converter->convert($html);
 
-        // $markdown_a = explode("\n", $markdown);
+        $markdown_a = explode("\n", $markdown);
 
         // Remove leading spaces on each line
-        // $markdown_a = array_map( function( $line ) {
-            // return ltrim( $line );
-        // }, $markdown_a);
+        $markdown_a = array_map( function( $line ) {
+            return ltrim( $line );
+        }, $markdown_a);
 
         // Concatenate
-        // $markdown = implode("\n", $markdown_a);
+        $markdown = implode("\n", $markdown_a);
 
         return $markdown;
 
