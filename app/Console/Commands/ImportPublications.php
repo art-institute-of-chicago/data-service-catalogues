@@ -160,6 +160,7 @@ class ImportPublications extends AbstractCommand
             $section->source_id = $source_id;
             $section->parent_id = $parent_id;
             $section->publication_id = $pub->id;
+            $section->accession = $section->getAccession();
             $section->save();
 
             $this->info("Imported Section #{$section->id}: '{$section->title}'");
