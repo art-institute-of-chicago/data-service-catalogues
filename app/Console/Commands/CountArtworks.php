@@ -9,7 +9,7 @@ use App\Section;
 class CountArtworks extends AbstractCommand
 {
 
-    protected $signature = 'count:artworks';
+    protected $signature = 'count:artworks {--unparsed : Show tombstones of artworks with unparsable accessions}';
 
     protected $description = "Count how many sections had 'Work of Art' content type";
 
@@ -39,12 +39,17 @@ class CountArtworks extends AbstractCommand
         $this->info( $tombstones->count() . ' of artworks have tombstones.');
         $this->info( $accessions->count() . ' of artworks with tombstones have parsable accessions.');
 
-        $this->warn( "Here's the list of unparsable artworks:\n" );
+        if( $this->option('unparsed') )
+        {
 
-        $unparsed->each( function( $artwork ) {
-            $this->warn( $artwork->id . ': ' . $artwork->title . "\n\n" );
-            $this->info( $artwork->getTombstone() . "\n" );
-        });
+            $this->warn( "Here's the list of unparsable artworks:\n" );
+
+            $unparsed->each( function( $artwork ) {
+                $this->warn( $artwork->id . ': ' . $artwork->title . "\n\n" );
+                $this->info( $artwork->getTombstone() . "\n" );
+            });
+
+        }
 
     }
 
