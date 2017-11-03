@@ -14,7 +14,7 @@ class SectionTransformer extends TransformerAbstract
         return [
             'id' => $section->id,
             'title' => $section->title,
-            'accession' => $section->accession(),
+            'accession' => $section->accession,
             'revision' => $section->revision,
             'source_id' => $section->source_id,
             'publication_id' => $section->publication->id ?? null,

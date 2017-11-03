@@ -17,6 +17,7 @@ class Sections extends Migration
         Schema::create('sections', function (Blueprint $table) {
             $table->bigInteger('id')->unsigned()->primary();
             $table->string('title')->nullable();
+            $table->string('accession')->nullable()->index();
             $table->integer('revision')->nullable();
             $table->integer('source_id')->nullable()->index();
             $table->integer('publication_id')->nullable()->unsigned()->index();

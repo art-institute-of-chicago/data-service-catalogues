@@ -167,7 +167,7 @@ class Section extends BaseModel
      *
      * @return string
      */
-    public function accession()
+    public function getAccession()
     {
 
         $tombstone = $this->getTombstone();
