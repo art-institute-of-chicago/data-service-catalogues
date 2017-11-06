@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         Commands\ImportPublications::class,
         Commands\ValidateSections::class,
         Commands\CountArtworks::class,
+        Commands\MatchArtworks::class,
     ];
 
     /**
