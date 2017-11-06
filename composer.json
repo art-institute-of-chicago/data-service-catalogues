@@ -12,7 +12,8 @@
         "graham-campbell/flysystem": "^4.0",
         "league/fractal": "^0.17.0",
         "symfony/dom-crawler": "^3.3",
-        "league/html-to-markdown": "^4.6"
+        "league/html-to-markdown": "^4.6",
+        "league/csv": "^9.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

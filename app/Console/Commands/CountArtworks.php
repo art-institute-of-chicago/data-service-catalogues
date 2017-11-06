@@ -34,10 +34,15 @@ class CountArtworks extends AbstractCommand
 
         $unparsed = $tombstones->diff( $accessions );
 
+        $matches = $accessions->filter( function( $artwork ) {
+            return $artwork->citi_id;
+        });
+
         $this->info( $sections->count() . ' sections in total.');
         $this->info( $artworks->count() . ' of these are artworks.');
         $this->info( $tombstones->count() . ' of artworks have tombstones.');
         $this->info( $accessions->count() . ' of artworks with tombstones have parsable accessions.');
+        $this->info( $matches->count() . ' have been matched to artworks in CITI.');
 
         if( $this->option('unparsed') )
         {
