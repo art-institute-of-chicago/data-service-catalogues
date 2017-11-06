@@ -29,7 +29,7 @@ class CountArtworks extends AbstractCommand
         });
 
         $accessions = $tombstones->filter( function( $artwork ) {
-            return $artwork->accession();
+            return $artwork->getAccession();
         });
 
         $unparsed = $tombstones->diff( $accessions );
