@@ -252,6 +252,10 @@ class Section extends BaseModel
         $plaintext = str_replace('\[', '[', $plaintext);
         $plaintext = str_replace('\]', ']', $plaintext);
 
+        // Null out if empty
+        $plaintext = trim( $plaintext );
+        $plaintext = empty( $plaintext ) ? null : $plaintext;
+
         return $plaintext;
 
     }
