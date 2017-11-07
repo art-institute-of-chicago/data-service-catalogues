@@ -20,6 +20,7 @@ class SectionTransformer extends TransformerAbstract
             'revision' => $section->revision,
             'source_id' => $section->source_id,
             'publication_id' => $section->publication->id ?? null,
+            'weight' => $section->weight,
             'parent_id' => $section->parent->id ?? null,
             'child_ids' => $section->children->pluck('id'),
         ];

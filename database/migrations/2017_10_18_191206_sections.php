@@ -21,6 +21,7 @@ class Sections extends Migration
             $table->integer('citi_id')->nullable()->index();
             $table->integer('revision')->nullable();
             $table->integer('source_id')->nullable()->index();
+            $table->integer('weight')->nullable()->index();
             $table->integer('publication_id')->nullable()->unsigned()->index();
             $table->foreign('publication_id')->references('id')->on('publications')->onDelete('cascade');
             $table->timestamps();
