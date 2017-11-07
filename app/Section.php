@@ -44,6 +44,16 @@ class Section extends BaseModel
     }
 
     /**
+     * Returns link to the section, rendered in the online reader.
+     *
+     * @return string
+     */
+    public function getWebUrl()
+    {
+        return $this->publication->getWebUrl() . "/section/{$this->source_id}";
+    }
+
+    /**
      * Retrieves the section's "Content Document" (XHTML) from filesystem storage.
      *
      * @return string

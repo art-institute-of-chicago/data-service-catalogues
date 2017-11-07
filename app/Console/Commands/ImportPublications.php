@@ -34,7 +34,7 @@ class ImportPublications extends AbstractCommand
     protected function downloadPubs()
     {
 
-        $pubs = $this->getPubCollection();
+        $pubs = Publication::getPubCollection();
 
         $pubs->each( [$this, 'downloadPub'] );
 
@@ -48,7 +48,7 @@ class ImportPublications extends AbstractCommand
     protected function downloadSections()
     {
 
-        $pubs = $this->getPubCollection();
+        $pubs = Publication::getPubCollection();
 
         $pubs->each( [$this, 'downloadSectionsForPub'] );
 
@@ -60,7 +60,7 @@ class ImportPublications extends AbstractCommand
     protected function importPubs()
     {
 
-        $pubs = $this->getPubCollection();
+        $pubs = Publication::getPubCollection();
 
         $pubs->each( [$this, 'importPub'] );
 
@@ -240,6 +240,7 @@ class ImportPublications extends AbstractCommand
         $publication = Publication::findOrNew( $pub->id );
         $publication->id = $pub->id;
         $publication->site = $pub->site;
+        $publication->alias = $pub->alias;
         $publication->title = $title;
         $publication->save();
 

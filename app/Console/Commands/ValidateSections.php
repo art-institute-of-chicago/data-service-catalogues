@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use GrahamCampbell\Flysystem\Facades\Flysystem;
 
+use App\Publication;
 use App\Section;
 
 class ValidateSections extends AbstractCommand
@@ -18,7 +19,7 @@ class ValidateSections extends AbstractCommand
     public function handle()
     {
 
-        $pubs = $this->getPubCollection();
+        $pubs = Publication::getPubCollection();
 
         $pubs->each( [$this, 'getSections'] );
 
