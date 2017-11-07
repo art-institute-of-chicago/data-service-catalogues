@@ -15,6 +15,16 @@ class Publication extends BaseModel
     }
 
     /**
+     * Returns link to the publication, rendered in the online reader.
+     *
+     * @return string
+     */
+    public function getWebUrl()
+    {
+        return "https://publications.artic.edu/{$this->site}/reader/{$this->alias}";
+    }
+
+    /**
      * Returns necessary config for importing publications. Edit this method to target specific pubs for processing.
      * Publication list has to be hardcoded to avoid importing test publications. Each pub is an object.
      *

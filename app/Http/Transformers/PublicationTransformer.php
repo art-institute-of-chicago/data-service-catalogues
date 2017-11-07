@@ -16,6 +16,7 @@ class PublicationTransformer extends TransformerAbstract
             'site' => $publication->site,
             'alias' => $publication->alias,
             'title' => $publication->title,
+            'web_url' => $publication->getWebUrl(),
             'section_ids' => $publication->sections->pluck('id'),
         ];
 

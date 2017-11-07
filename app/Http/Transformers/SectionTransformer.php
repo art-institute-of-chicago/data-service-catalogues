@@ -14,6 +14,7 @@ class SectionTransformer extends TransformerAbstract
         return [
             'id' => $section->id,
             'title' => $section->title,
+            'web_url' => $section->getWebUrl(),
             'accession' => $section->accession,
             'citi_id' => $section->citi_id,
             'revision' => $section->revision,
