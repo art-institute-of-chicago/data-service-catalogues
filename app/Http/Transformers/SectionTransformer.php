@@ -23,6 +23,7 @@ class SectionTransformer extends TransformerAbstract
             'weight' => $section->weight,
             'parent_id' => $section->parent->id ?? null,
             'child_ids' => $section->children->pluck('id'),
+            'content' => $section->content,
         ];
 
     }
