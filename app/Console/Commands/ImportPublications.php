@@ -240,6 +240,7 @@ class ImportPublications extends AbstractCommand
         $publication = Publication::findOrNew( $pub->id );
         $publication->id = $pub->id;
         $publication->site = $pub->site;
+        $publication->alias = $pub->alias;
         $publication->title = $title;
         $publication->save();
 

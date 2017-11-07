@@ -17,6 +17,7 @@ class Publications extends Migration
         Schema::create('publications', function (Blueprint $table) {
             $table->integer('id')->unsigned()->primary();
             $table->string('site')->nullable();
+            $table->string('alias')->nullable();
             $table->string('title')->nullable();
             $table->timestamps();
         });

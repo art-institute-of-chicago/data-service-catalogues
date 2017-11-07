@@ -26,42 +26,52 @@ class Publication extends BaseModel
         $pubs = [
             [
                 'site' => 'renoir',
+                'alias' => 'paintingsanddrawings',
                 'id' => '135446',
             ],
             [
                 'site' => 'monet',
+                'alias' => 'paintingsanddrawings',
                 'id' => '135466',
             ],
             [
                 'site' => 'ensor',
+                'alias' => 'temptationstanthony',
                 'id' => '226',
             ],
             [
                 'site' => 'pissarro',
+                'alias' => 'paintingsandpaper',
                 'id' => '7',
             ],
             [
                 'site' => 'whistler',
+                'alias' => 'linkedvisions',
                 'id' => '406',
             ],
             [
                 'site' => 'caillebotte',
+                'alias' => 'paintingsanddrawings',
                 'id' => '445',
             ],
             [
                 'site' => 'gauguin',
+                'alias' => 'gauguinart',
                 'id' => '141096',
             ],
             [
                 'site' => 'modernseries',
+                'alias' => 'shatterrupturebreak',
                 'id' => '12',
             ],
             [
                 'site' => 'roman',
+                'alias' => 'romanart',
                 'id' => '480',
             ],
             [
                 'site' => 'manet',
+                'alias' => 'manetart',
                 'id' => '140019',
             ],
         ];
