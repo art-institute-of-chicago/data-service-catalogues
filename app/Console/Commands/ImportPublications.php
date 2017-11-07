@@ -98,8 +98,9 @@ class ImportPublications extends AbstractCommand
         $items = $crawler->filterXPath("//a[@data-section_id]");
 
         $sections = [];
+        $weight = 0;
 
-        $items->each( function( $item ) use (&$sections, &$pub) {
+        $items->each( function( $item ) use (&$sections, &$pub, &$weight) {
 
             $source_id = (int) $item->attr( 'data-section_id' );
             $cantor_id = self::cantor_pair_calculate( $pub->id, $source_id );
@@ -161,9 +162,12 @@ class ImportPublications extends AbstractCommand
             $section->parent_id = $parent_id;
             $section->publication_id = $pub->id;
             $section->accession = $section->getAccession();
+            $section->weight = $weight;
             $section->save();
 
             $this->info("Imported Section #{$section->id}: '{$section->title}'");
+
+            $weight++;
 
         });
 
