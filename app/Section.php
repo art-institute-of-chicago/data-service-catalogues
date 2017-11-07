@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Builder;
+
 use GrahamCampbell\Flysystem\Facades\Flysystem;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -21,6 +23,29 @@ class Section extends BaseModel
      * @var string
      */
     protected $content;
+
+
+    /**
+     * Defines default order as `publication_id` descending, then `weight` ascending.
+     * Uses the inline method for scope definition, rather than creating new classes.
+     *
+     * @link https://stackoverflow.com/questions/20701216/laravel-default-orderby
+     *
+     * {@inheritdoc}
+     */
+    protected static function boot() {
+
+        parent::boot();
+
+        static::addGlobalScope('order-publication', function (Builder $builder) {
+            $builder->orderBy('publication_id', 'desc');
+        });
+
+        static::addGlobalScope('order-weight', function (Builder $builder) {
+            $builder->orderBy('weight', 'asc');
+        });
+
+    }
 
     public function publication()
     {
