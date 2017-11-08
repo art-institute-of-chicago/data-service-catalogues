@@ -21,6 +21,9 @@ $app->group(['prefix' => 'v1'], function() use ($app) {
     $app->get('publications', 'PublicationController@index');
     $app->get('publications/{id}', 'PublicationController@show');
 
+    // For debugging plaintext. Must be declared before sections/{id}
+    $app->get('sections/{id}.txt', 'SectionController@contentPlaintext');
+
     $app->get('sections', 'SectionController@index');
     $app->get('sections/{id}', 'SectionController@show');
 

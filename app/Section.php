@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use GrahamCampbell\Flysystem\Facades\Flysystem;
 use Symfony\Component\DomCrawler\Crawler;
 
+use Wa72\HtmlPageDom\HtmlPageCrawler;
 use League\HTMLToMarkdown\HtmlConverter;
 
 use App\BaseModel;
@@ -119,6 +120,7 @@ class Section extends BaseModel
     /**
      * Determines this section's content type in the original OSCI Toolkit Drupal instance.
      *
+     * @param  \Symfony\Component\DomCrawler\Crawler $crawler
      * @return string
      */
     public function getType( $crawler = null )
@@ -137,6 +139,7 @@ class Section extends BaseModel
     /**
      * Determines whether or not this section had the "Work of Art" content type in Drupal.
      *
+     * @param  \Symfony\Component\DomCrawler\Crawler $crawler
      * @return boolean
      */
     public function isArtwork( $crawler = null )
@@ -149,9 +152,10 @@ class Section extends BaseModel
     }
 
     /**
-     * Attempt to associate an accession (main reference number) with a section.
+     * Returns Markdown representation of the tombstone section.
      * This only works for sections that were created with the "Work of Art" content type.
      *
+     * @param  \Symfony\Component\DomCrawler\Crawler $crawler
      * @return string
      */
     public function getTombstone( $crawler = null )
@@ -167,14 +171,23 @@ class Section extends BaseModel
             return null;
         }
 
-        // TODO: Everything below here is cleanup stuff that should be abstracted elsewhere
+        return $this->getPlaintext( $crawler );
 
-        // Remove all anchor tags
-        $crawler->filterXPath('//a')->each( function( Crawler $subcrawler ) {
-            foreach ($subcrawler as $node) {
-                $node->parentNode->removeChild($node);
-            }
-        });
+    }
+
+    /**
+     * Returns Markdown representation of section content.
+     * This is meant to be a somewhat less-lossy process than `getPlaintext`.
+     *
+     * @TODO How to best handle tags that cannot be processed into Markdown?
+     *
+     * @param  \Symfony\Component\DomCrawler\Crawler $crawler
+     * @return string
+     */
+    public function getMarkdown( $crawler = null )
+    {
+
+        $crawler = $crawler ?? $this->getContentCrawler()->filter('body');
 
         $html = $crawler->html();
         $html = trim($html);
@@ -193,6 +206,71 @@ class Section extends BaseModel
         $markdown = implode("\n", $markdown_a);
 
         return $markdown;
+
+    }
+
+    /**
+     * Return plaintext representation of the entire section. This is a "lossy" process.
+     * No styles, figures, or links are retained. It's meant for indexing stuff into search.
+     *
+     * @TODO Minimize duplication between this and `getMarkdown`?
+     *
+     * @param  \Symfony\Component\DomCrawler\Crawler $crawler
+     * @return string
+     */
+    public function getPlaintext( $crawler = null )
+    {
+
+        $crawler = $crawler ?? $this->getContentCrawler()->filter('body');
+
+        // Use HTMLPageDOM for these manipulations
+        $crawler = new HtmlPageCrawler( $crawler );
+
+        // Remove non-text, non-markdown elements
+        $crawler->filter('.footnote-reference')->remove();
+
+        // Only h3-h6 should exist, but target all h's just in case
+        $crawler->filter('h1, h2, h3, h4, h5, h6')->remove();
+
+        $crawler->filter('span')->unwrapInner();
+        $crawler->filter('a')->unwrapInner();
+
+        // Markdown handles these great, but we don't want them for plaintext
+        $crawler->filter('u, i, b, em, strong')->unwrapInner();
+
+        // OSCI Toolkit-specific markup for figures
+        $crawler->filter('figure > img, figure > .figure_content')->remove();
+        $crawler->filter('figure')->unwrapInner();
+        $crawler->filter('figcaption, figcaption > div')->unwrapInner();
+
+        $crawler->filter('aside')->unwrapInner();
+        $crawler->filter('section')->unwrapInner();
+
+        // Mostly for TOC-like pages
+        // http://data-service-catalogues.dev/v1/sections/39548249564.txt
+        $crawler->filter('div')->unwrapInner();
+        $crawler->filter('img')->remove();
+
+        // TODO: Replace <sup/> and <sub/> numerals w/ Unicode equivallents?
+        // https://en.wikipedia.org/wiki/Unicode_subscripts_and_superscripts
+        // Meant for chemical formulas, e.g. see tech report section here:
+        // http://data-service-catalogues.dev/v1/sections/478250.txt
+
+        // Use the Markdown processor to handle whitespace, etc.
+        $markdown = $this->getMarkdown( $crawler );
+
+        // Prepare to remove Markdown artifacts
+        $plaintext = $markdown;
+
+        // Remove backslashes from \[ and \]
+        $plaintext = str_replace('\[', '[', $plaintext);
+        $plaintext = str_replace('\]', ']', $plaintext);
+
+        // Null out if empty
+        $plaintext = trim( $plaintext );
+        $plaintext = empty( $plaintext ) ? null : $plaintext;
+
+        return $plaintext;
 
     }
 

@@ -13,6 +13,16 @@ class SectionController extends Controller
 
     protected $transformer = \App\Http\Transformers\SectionTransformer::class;
 
+    // sections/{id}.txt
+    public function contentPlaintext(Request $request, $id) {
+
+        $section = ($this->model)::find($id);
+        $content = $section->getPlaintext();
+
+        return response( $content )->header( 'Content-Type', 'text/markdown; charset=UTF-8' );
+
+    }
+
     // publications/{id}/sections
     public function indexForPublication(Request $request, $id) {
 
