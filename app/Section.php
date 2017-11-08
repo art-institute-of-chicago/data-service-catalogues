@@ -229,18 +229,32 @@ class Section extends BaseModel
         // Remove non-text, non-markdown elements
         $crawler->filter('.footnote-reference')->remove();
 
-        $crawler->filter('h3, h4, h5')->remove();
+        // Only h3-h6 should exist, but target all h's just in case
+        $crawler->filter('h1, h2, h3, h4, h5, h6')->remove();
+
         $crawler->filter('span')->unwrapInner();
         $crawler->filter('a')->unwrapInner();
-        $crawler->filter('u, i, em, strong')->unwrapInner();
 
+        // Markdown handles these great, but we don't want them for plaintext
+        $crawler->filter('u, i, b, em, strong')->unwrapInner();
+
+        // OSCI Toolkit-specific markup for figures
         $crawler->filter('figure > img, figure > .figure_content')->remove();
         $crawler->filter('figure')->unwrapInner();
         $crawler->filter('figcaption, figcaption > div')->unwrapInner();
 
         $crawler->filter('aside')->unwrapInner();
-
         $crawler->filter('section')->unwrapInner();
+
+        // Mostly for TOC-like pages
+        // http://data-service-catalogues.dev/v1/sections/39548249564.txt
+        $crawler->filter('div')->unwrapInner();
+        $crawler->filter('img')->remove();
+
+        // TODO: Replace <sup/> and <sub/> numerals w/ Unicode equivallents?
+        // https://en.wikipedia.org/wiki/Unicode_subscripts_and_superscripts
+        // Meant for chemical formulas, e.g. see tech report section here:
+        // http://data-service-catalogues.dev/v1/sections/478250.txt
 
         // Use the Markdown processor to handle whitespace, etc.
         $markdown = $this->getMarkdown( $crawler );
