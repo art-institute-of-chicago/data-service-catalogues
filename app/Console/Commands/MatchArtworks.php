@@ -5,20 +5,62 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use GrahamCampbell\Flysystem\Facades\Flysystem;
 use League\Csv\Writer;
+use League\Csv\Reader;
 
 use App\Section;
 
 class MatchArtworks extends AbstractCommand
 {
 
-    protected $signature = 'match:artworks';
+    protected $signature = 'match:artworks {--csv : Import from match.csv, instead of querying the data hub }';
 
     protected $description = "Attempt to match artworks by accession using the data hub";
+
+    public static $filename = 'match.csv';
 
     protected $csv;
 
     public function handle()
     {
+
+        return $this->option('csv') ? $this->importFromCsv() : $this->importFromApi();
+
+    }
+
+    public function importFromCsv()
+    {
+
+        $path = Flysystem::getAdapter()->getPathPrefix() . self::$filename;
+        $this->csv = Reader::createFromPath( $path, 'r' );
+
+        $this->csv->setHeaderOffset(0);
+
+        $records = $this->csv->getRecords();
+
+        foreach( $records as $record )
+        {
+
+            $citi_id = !empty( $record['citi_id'] ) ? $record['citi_id'] : null;
+
+            $section = Section::findOrFail( $record['dsc_id'] );
+            $section->accession = $record['dsc_mrn'];
+            $section->citi_id = $citi_id;
+            $section->save();
+
+            $this->info( "Section {$section->id} associated with Artwork {$section->citi_id} ({$section->accession})" );
+
+        }
+
+    }
+
+    public function importFromApi()
+    {
+
+        // Ask to overwrite existing file? Appending doesn't make much sense for successive runs...
+        if( Flysystem::has( self::$filename ) && !$this->confirm('Do you wish to overwrite existing ' . self::$filename . '?') )
+        {
+            return 0;
+        }
 
         // Reset citi_id for all sections
         Section::query()->update(['citi_id' => null]);
@@ -28,13 +70,13 @@ class MatchArtworks extends AbstractCommand
         // For testing, only grab the first few records
         // $sections = $sections->slice(0, 5);
 
-        // TODO: Ask to overwrite existing file? Appending doesn't make much sense for successive runs...
-
-        $path = Flysystem::getAdapter()->getPathPrefix() . 'match.csv';
+        $path = Flysystem::getAdapter()->getPathPrefix() . self::$filename;
         $this->csv = Writer::createFromPath( $path, 'w' );
         $this->csv->insertOne( ['matches', 'dsc_id', 'citi_id', 'dsc_mrn', 'citi_mrn', 'dsc_title', 'citi_title'] );
 
         $results = $sections->map( [$this, 'match'] );
+
+        return $results;
 
     }
 
