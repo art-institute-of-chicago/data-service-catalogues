@@ -4,8 +4,53 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "20bfdfe4ea3893e2f947c7fe68131213",
+    "content-hash": "16b0583e0162c0a8e2683e8e123fc784",
     "packages": [
+        {
+            "name": "aic/data-hub-foundation",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/art-institute-of-chicago/data-hub-foundation.git",
+                "reference": "21e4fcb344c95063a3c0d6682a20253ad1cc3da5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/art-institute-of-chicago/data-hub-foundation/zipball/21e4fcb344c95063a3c0d6682a20253ad1cc3da5",
+                "reference": "21e4fcb344c95063a3c0d6682a20253ad1cc3da5",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^5.4",
+                "league/fractal": "^0.16.0",
+                "php": ">=7.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Aic\\Hub\\Foundation\\": "src/"
+                }
+            },
+            "license": [
+                "AGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Illya Moskvin",
+                    "email": "imoskvin@artic.edu"
+                },
+                {
+                    "name": "Nikhil Trivedi",
+                    "email": "ntrive@artic.edu"
+                }
+            ],
+            "description": "Shared components for our data hub services.",
+            "support": {
+                "source": "https://github.com/art-institute-of-chicago/data-hub-foundation/tree/master",
+                "issues": "https://github.com/art-institute-of-chicago/data-hub-foundation/issues"
+            },
+            "time": "2018-01-08 06:37:55"
+        },
         {
             "name": "doctrine/inflector",
             "version": "v1.2.0",
@@ -662,6 +707,70 @@
                 "storage"
             ],
             "time": "2017-08-06T17:41:04+00:00"
+        },
+        {
+            "name": "league/fractal",
+            "version": "0.16.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/fractal.git",
+                "reference": "d0445305e308d9207430680acfd580557b679ddc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/fractal/zipball/d0445305e308d9207430680acfd580557b679ddc",
+                "reference": "d0445305e308d9207430680acfd580557b679ddc",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "doctrine/orm": "^2.5",
+                "illuminate/contracts": "~5.0",
+                "mockery/mockery": "~0.9",
+                "pagerfanta/pagerfanta": "~1.0.0",
+                "phpunit/phpunit": "~4.0",
+                "squizlabs/php_codesniffer": "~1.5",
+                "zendframework/zend-paginator": "~2.3"
+            },
+            "suggest": {
+                "illuminate/pagination": "The Illuminate Pagination component.",
+                "pagerfanta/pagerfanta": "Pagerfanta Paginator",
+                "zendframework/zend-paginator": "Zend Framework Paginator"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.13-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Fractal\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Phil Sturgeon",
+                    "email": "me@philsturgeon.uk",
+                    "homepage": "http://philsturgeon.uk/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Handle the output of complex data structures ready for API output.",
+            "homepage": "http://fractal.thephpleague.com/",
+            "keywords": [
+                "api",
+                "json",
+                "league",
+                "rest"
+            ],
+            "time": "2017-03-12T01:28:43+00:00"
         },
         {
             "name": "league/html-to-markdown",
@@ -3744,7 +3853,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "aic/data-hub-foundation": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
