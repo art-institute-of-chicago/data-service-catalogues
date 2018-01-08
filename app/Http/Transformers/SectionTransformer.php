@@ -2,14 +2,12 @@
 
 namespace App\Http\Transformers;
 
-use App\Section;
-
 use Aic\Hub\Foundation\AbstractTransformer;
 
 class SectionTransformer extends AbstractTransformer
 {
 
-    public function transform(Section $section)
+    public function transform($section)
     {
 
         return [

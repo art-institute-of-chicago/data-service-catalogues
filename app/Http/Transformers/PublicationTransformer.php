@@ -2,14 +2,12 @@
 
 namespace App\Http\Transformers;
 
-use App\Publication;
-
 use Aic\Hub\Foundation\AbstractTransformer;
 
 class PublicationTransformer extends AbstractTransformer
 {
 
-    public function transform(Publication $publication)
+    public function transform($publication)
     {
 
         return [
