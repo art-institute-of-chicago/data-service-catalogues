@@ -1,33 +1,21 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It is a breeze. Simply tell Lumen the URIs it should respond to
-| and give it the Closure to call when that URI is requested.
-|
-*/
-
-$app->get('/', function () use ($app) {
-    return $app->version();
+Route::get('/', function () {
+    return redirect('/api/v1');
 });
 
+Route::group(['prefix' => 'v1'], function() {
 
-$app->group(['prefix' => 'v1'], function() use ($app) {
-
-    $app->get('publications', 'PublicationController@index');
-    $app->get('publications/{id}', 'PublicationController@show');
+    Route::get('publications', 'PublicationController@index');
+    Route::get('publications/{id}', 'PublicationController@show');
 
     // For debugging plaintext. Must be declared before sections/{id}
-    $app->get('sections/{id}.txt', 'SectionController@contentPlaintext');
+    Route::get('sections/{id}.txt', 'SectionController@contentPlaintext');
 
-    $app->get('sections', 'SectionController@index');
-    $app->get('sections/{id}', 'SectionController@show');
+    Route::get('sections', 'SectionController@index');
+    Route::get('sections/{id}', 'SectionController@show');
 
-    $app->get('publications/{id}/sections', 'SectionController@indexForPublication');
-    $app->get('publications/{publication_id}/sections/{id}', 'SectionController@showForPublication');
+    Route::get('publications/{id}/sections', 'SectionController@indexForPublication');
+    Route::get('publications/{publication_id}/sections/{id}', 'SectionController@showForPublication');
 
 });
