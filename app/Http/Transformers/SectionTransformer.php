@@ -3,9 +3,10 @@
 namespace App\Http\Transformers;
 
 use App\Section;
-use League\Fractal\TransformerAbstract;
 
-class SectionTransformer extends TransformerAbstract
+use Aic\Hub\Foundation\AbstractTransformer;
+
+class SectionTransformer extends AbstractTransformer
 {
 
     public function transform(Section $section)

@@ -3,9 +3,10 @@
 namespace App\Http\Transformers;
 
 use App\Publication;
-use League\Fractal\TransformerAbstract;
 
-class PublicationTransformer extends TransformerAbstract
+use Aic\Hub\Foundation\AbstractTransformer;
+
+class PublicationTransformer extends AbstractTransformer
 {
 
     public function transform(Publication $publication)
