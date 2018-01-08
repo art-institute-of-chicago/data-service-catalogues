@@ -10,7 +10,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Wa72\HtmlPageDom\HtmlPageCrawler;
 use League\HTMLToMarkdown\HtmlConverter;
 
-use App\BaseModel;
+use Aic\Hub\Foundation\AbstractModel as BaseModel;
 
 class Section extends BaseModel
 {
