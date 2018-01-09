@@ -15,8 +15,6 @@
         "laravel/framework": "^5.5",
         "aic/data-hub-foundation": "dev-master#ccb35d9a7aa38dd84d80a8e4b46cb3b38f559f39",
         "league/csv": "^9.1",
-        "league/flysystem": "^1.0",
-        "graham-campbell/flysystem": "^4.0",
         "league/html-to-markdown": "^4.6",
         "symfony/dom-crawler": "^3.3",
         "wa72/htmlpagedom": "^1.3"
