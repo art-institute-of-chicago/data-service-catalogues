@@ -2,8 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use GrahamCampbell\Flysystem\Facades\Flysystem;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\DomCrawler\Crawler;
 
 use App\Publication;
@@ -88,7 +87,7 @@ class ImportPublications extends AbstractCommand
 
         $file = $this->getNavPath( $pub );
 
-        $contents = Flysystem::read( $file );
+        $contents = Storage::get( $file );
 
         $crawler = new Crawler();
         $crawler->addHtmlContent( $contents, 'UTF-8' );
@@ -115,11 +114,11 @@ class ImportPublications extends AbstractCommand
             // Download the section
             $file = $this->getPubPath( $pub ) . "/sections/{$source_id}.xhtml";
 
-            if( !Flysystem::has( $file ) || $this->option('redownload') )
+            if( !Storage::exists( $file ) || $this->option('redownload') )
             {
 
                 $contents = file_get_contents( $url );
-                Flysystem::put( $file, $contents );
+                Storage::put( $file, $contents );
 
                 $this->warn("Downloaded {$url} to {$file}");
 
@@ -128,7 +127,7 @@ class ImportPublications extends AbstractCommand
             // Get the title from the downloaded content file
             // TODO: Get title from the nav instead?
             $file = $this->getPubPath( $pub ) . "/sections/{$source_id}.xhtml";
-            $contents = Flysystem::read( $file );
+            $contents = Storage::get( $file );
 
             $crawler = new Crawler();
             $crawler->addHtmlContent( $contents, 'UTF-8' );
@@ -184,13 +183,13 @@ class ImportPublications extends AbstractCommand
 
         $file = $this->getPackagePath( $pub );
 
-        if( !Flysystem::has( $file ) || $this->option('redownload') )
+        if( !Storage::exists( $file ) || $this->option('redownload') )
         {
 
             $url = $this->getPackageUrl( $pub );
             $contents = file_get_contents( $url );
 
-            Flysystem::put( $file, $contents );
+            Storage::put( $file, $contents );
 
             $this->warn("Downloaded {$url} to {$file}");
 
@@ -208,13 +207,13 @@ class ImportPublications extends AbstractCommand
 
         $file = $this->getNavPath( $pub );
 
-        if( !Flysystem::has( $file ) || $this->option('redownload') )
+        if( !Storage::exists( $file ) || $this->option('redownload') )
         {
 
             $url = $this->getNavUrl( $pub );
             $contents = file_get_contents( $url );
 
-            Flysystem::put( $file, $contents );
+            Storage::put( $file, $contents );
 
             $this->warn("Downloaded {$url} to {$file}");
 
@@ -232,7 +231,7 @@ class ImportPublications extends AbstractCommand
 
         $file = $this->getPackagePath( $pub );
 
-        $contents = Flysystem::read( $file );
+        $contents = Storage::get( $file );
 
         $crawler = new Crawler();
         $crawler->setDefaultNamespacePrefix('opf'); // http://www.idpf.org/2007/opf

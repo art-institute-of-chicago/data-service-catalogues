@@ -1,9 +1,6 @@
 <?php
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use GrahamCampbell\Flysystem\Facades\Flysystem;
-
 use App\Section;
 
 class CountArtworks extends AbstractCommand
