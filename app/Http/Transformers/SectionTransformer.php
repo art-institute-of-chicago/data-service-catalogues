@@ -2,16 +2,15 @@
 
 namespace App\Http\Transformers;
 
-use App\Section;
-use League\Fractal\TransformerAbstract;
+use Aic\Hub\Foundation\AbstractTransformer;
 
-class SectionTransformer extends TransformerAbstract
+class SectionTransformer extends AbstractTransformer
 {
 
-    public function transform(Section $section)
+    public function transform($section)
     {
 
-        return [
+        $data = [
             'id' => $section->id,
             'title' => $section->title,
             'web_url' => $section->getWebUrl(),
@@ -25,6 +24,9 @@ class SectionTransformer extends TransformerAbstract
             'child_ids' => $section->children->pluck('id'),
             'content' => $section->content,
         ];
+
+        // Enables ?fields= functionality
+        return parent::transform($data);
 
     }
 

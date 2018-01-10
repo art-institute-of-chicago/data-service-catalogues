@@ -1,8 +1,7 @@
 <?php
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use GrahamCampbell\Flysystem\Facades\Flysystem;
+use Illuminate\Support\Facades\Storage;
 
 use App\Publication;
 use App\Section;
@@ -35,7 +34,7 @@ class ValidateSections extends AbstractCommand
     public function getSections( $pub )
     {
 
-        $files = Flysystem::listContents( $this->getPubPath( $pub ) . '/sections' );
+        $files = Storage::files( $this->getPubPath( $pub ) . '/sections' );
 
         foreach( $files as $file ) {
 

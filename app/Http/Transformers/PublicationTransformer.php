@@ -2,16 +2,15 @@
 
 namespace App\Http\Transformers;
 
-use App\Publication;
-use League\Fractal\TransformerAbstract;
+use Aic\Hub\Foundation\AbstractTransformer;
 
-class PublicationTransformer extends TransformerAbstract
+class PublicationTransformer extends AbstractTransformer
 {
 
-    public function transform(Publication $publication)
+    public function transform($publication)
     {
 
-        return [
+        $data = [
             'id' => $publication->id,
             'site' => $publication->site,
             'alias' => $publication->alias,
@@ -19,6 +18,9 @@ class PublicationTransformer extends TransformerAbstract
             'web_url' => $publication->getWebUrl(),
             'section_ids' => $publication->sections->pluck('id'),
         ];
+
+        // Enables ?fields= functionality
+        return parent::transform($data);
 
     }
 

@@ -2,8 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use GrahamCampbell\Flysystem\Facades\Flysystem;
+use Illuminate\Support\Facades\Storage;
 use League\Csv\Writer;
 use League\Csv\Reader;
 
@@ -27,11 +26,17 @@ class MatchArtworks extends AbstractCommand
 
     }
 
+    protected function getCsvPath()
+    {
+
+        return Storage::disk('local')->getDriver()->getAdapter()->getPathPrefix() . self::$filename;
+
+    }
+
     public function importFromCsv()
     {
 
-        $path = Flysystem::getAdapter()->getPathPrefix() . self::$filename;
-        $this->csv = Reader::createFromPath( $path, 'r' );
+        $this->csv = Reader::createFromPath( $this->getCsvPath(), 'r' );
 
         $this->csv->setHeaderOffset(0);
 
@@ -57,7 +62,7 @@ class MatchArtworks extends AbstractCommand
     {
 
         // Ask to overwrite existing file? Appending doesn't make much sense for successive runs...
-        if( Flysystem::has( self::$filename ) && !$this->confirm('Do you wish to overwrite existing ' . self::$filename . '?') )
+        if( Storage::exists( self::$filename ) && !$this->confirm('Do you wish to overwrite existing ' . self::$filename . '?') )
         {
             return 0;
         }
@@ -70,8 +75,7 @@ class MatchArtworks extends AbstractCommand
         // For testing, only grab the first few records
         // $sections = $sections->slice(0, 5);
 
-        $path = Flysystem::getAdapter()->getPathPrefix() . self::$filename;
-        $this->csv = Writer::createFromPath( $path, 'w' );
+        $this->csv = Writer::createFromPath( $this->getCsvPath(), 'w' );
         $this->csv->insertOne( ['matches', 'dsc_id', 'citi_id', 'dsc_mrn', 'citi_mrn', 'dsc_title', 'citi_title'] );
 
         $results = $sections->map( [$this, 'match'] );

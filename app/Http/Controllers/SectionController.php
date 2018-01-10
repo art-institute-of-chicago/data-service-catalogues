@@ -6,7 +6,9 @@ use App\Section;
 use App\Publication;
 use Illuminate\Http\Request;
 
-class SectionController extends Controller
+use Aic\Hub\Foundation\AbstractController as BaseController;
+
+class SectionController extends BaseController
 {
 
     protected $model = \App\Section::class;

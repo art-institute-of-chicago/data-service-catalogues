@@ -4,13 +4,13 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Builder;
 
-use GrahamCampbell\Flysystem\Facades\Flysystem;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\DomCrawler\Crawler;
 
 use Wa72\HtmlPageDom\HtmlPageCrawler;
 use League\HTMLToMarkdown\HtmlConverter;
 
-use App\BaseModel;
+use Aic\Hub\Foundation\AbstractModel as BaseModel;
 
 class Section extends BaseModel
 {
@@ -90,7 +90,7 @@ class Section extends BaseModel
         if( !$this->content ) {
 
             $file = "{$this->publication->site}/{$this->publication->id}/sections/{$this->source_id}.xhtml";
-            $this->content = Flysystem::read( $file );
+            $this->content = Storage::get( $file );
 
         }
 
