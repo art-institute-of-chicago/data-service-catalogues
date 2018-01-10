@@ -10,7 +10,7 @@ class PublicationTransformer extends AbstractTransformer
     public function transform($publication)
     {
 
-        return [
+        $data = [
             'id' => $publication->id,
             'site' => $publication->site,
             'alias' => $publication->alias,
@@ -18,6 +18,9 @@ class PublicationTransformer extends AbstractTransformer
             'web_url' => $publication->getWebUrl(),
             'section_ids' => $publication->sections->pluck('id'),
         ];
+
+        // Enables ?fields= functionality
+        return parent::transform($data);
 
     }
 
