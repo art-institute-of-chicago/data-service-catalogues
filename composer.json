@@ -13,7 +13,7 @@
     "require": {
         "php": ">=5.6.4",
         "laravel/framework": "^5.5",
-        "aic/data-hub-foundation": "dev-master#ccb35d9a7aa38dd84d80a8e4b46cb3b38f559f39",
+        "aic/data-hub-foundation": "dev-master#dd91c35745b6b61607b0f558dbba984bc0af96ca",
         "league/csv": "^9.1",
         "league/html-to-markdown": "^4.6",
         "symfony/dom-crawler": "^3.3",
