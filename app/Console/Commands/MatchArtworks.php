@@ -123,8 +123,7 @@ class MatchArtworks extends AbstractCommand
     {
 
         $query = [
-            'q' => $accession,
-            '_source' => [
+            'fields' => [
                 'id',
                 'title',
                 'main_reference_number'
