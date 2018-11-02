@@ -28,7 +28,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
 
-        $schedule->command('import:pubs --quiet')
+        $schedule->command('import:pubs --redownload --quiet')
             ->dailyAt('23:' .(config('app.env') == 'production' ? '00' : '15'))
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/import.log'))
