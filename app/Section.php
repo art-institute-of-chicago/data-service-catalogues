@@ -244,7 +244,10 @@ class Section extends BaseModel
         $crawler->filter('figcaption, figcaption > div')->unwrapInner();
 
         $crawler->filter('aside')->unwrapInner();
-        $crawler->filter('section')->unwrapInner();
+
+        // Uncommented as this seems to be wiping out the tombstone entirely,
+        // since it's wrapped in a section
+        // $crawler->filter('section')->unwrapInner();
 
         // Mostly for TOC-like pages
         // http://data-service-catalogues.dev/v1/sections/39548249564.txt
