@@ -61,12 +61,6 @@ class MatchArtworks extends AbstractCommand
     public function importFromApi()
     {
 
-        // Ask to overwrite existing file? Appending doesn't make much sense for successive runs...
-        if( Storage::exists( self::$filename ) && !$this->confirm('Do you wish to overwrite existing ' . self::$filename . '?') )
-        {
-            return 0;
-        }
-
         // Reset citi_id for all sections
         Section::query()->update(['citi_id' => null]);
 
