@@ -96,10 +96,9 @@ class ImportPublications extends AbstractCommand
         // https://stackoverflow.com/questions/4858689/trouble-using-xpath-starts-with-to-parse-xhtml
         $items = $crawler->filterXPath("//a[@data-section_id]");
 
-        $sections = [];
         $weight = 0;
 
-        $items->each( function( $item ) use (&$sections, &$pub, &$weight) {
+        $items->each( function( $item ) use (&$pub, &$weight) {
 
             $source_id = (int) $item->attr( 'data-section_id' );
             $cantor_id = self::cantor_pair_calculate( $pub->id, $source_id );
