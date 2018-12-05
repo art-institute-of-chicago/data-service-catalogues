@@ -75,6 +75,11 @@ class Publication extends BaseModel
                 'id' => '12',
             ],
             [
+                'site' => 'modernseries2',
+                'alias' => 'go',
+                'id' => '34',
+            ],
+            [
                 'site' => 'roman',
                 'alias' => 'romanart',
                 'id' => '480',
@@ -83,6 +88,11 @@ class Publication extends BaseModel
                 'site' => 'manet',
                 'alias' => 'manetart',
                 'id' => '140019',
+            ],
+            [
+                'site' => 'americansilver',
+                'alias' => 'collection',
+                'id' => '2',
             ],
         ];
 
