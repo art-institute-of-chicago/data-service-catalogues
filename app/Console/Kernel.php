@@ -32,15 +32,13 @@ class Kernel extends ConsoleKernel
             ->dailyAt('23:' .(config('app.env') == 'production' ? '00' : '15'))
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/import.log'))
-            ->sendOutputTo(storage_path('logs/import-last-run.log'))
-            ->emailOutputTo([env('LOG_EMAIL_1'), env('LOG_EMAIL_2')], true);
+            ->sendOutputTo(storage_path('logs/import-last-run.log'));
 
         $schedule->command('match:artworks --quiet')
             ->weeklyOn(6, '03:' .(config('app.env') == 'production' ? '00' : '15'))
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/match.log'))
-            ->sendOutputTo(storage_path('logs/match-last-run.log'))
-            ->emailOutputTo([env('LOG_EMAIL_1'), env('LOG_EMAIL_2')], true);
+            ->sendOutputTo(storage_path('logs/match-last-run.log'));
 
     }
 }
