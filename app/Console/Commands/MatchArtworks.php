@@ -117,6 +117,9 @@ class MatchArtworks extends AbstractCommand
     {
 
         $query = [
+            'resources' => [
+                'artworks',
+            ],
             'fields' => [
                 'id',
                 'title',
