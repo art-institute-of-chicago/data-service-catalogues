@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "d459ddba9c39df2b11dce14a40d9991b",
+    "content-hash": "f8dff769688ae7507bd89090e725142c",
     "packages": [
         {
             "name": "aic/data-hub-foundation",
@@ -4656,11 +4656,11 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": {
         "aic/data-hub-foundation": 20
     },
-    "prefer-stable": true,
+    "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": "^7.1.3"
