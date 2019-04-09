@@ -8,15 +8,12 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 class Kernel extends ConsoleKernel
 {
     /**
-     * The Artisan commands provided by your application.
+     * Use this to import third-party Artisan commands.
      *
      * @var array
      */
     protected $commands = [
-        Commands\ImportPublications::class,
-        Commands\ValidateSections::class,
-        Commands\CountArtworks::class,
-        Commands\MatchArtworks::class,
+        \Aic\Hub\Foundation\Commands\DatabaseReset::class,
     ];
 
     /**
@@ -38,5 +35,15 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->sendOutputTo(storage_path('logs/match-last-run.log'));
 
+    }
+
+    /**
+     * Use this to auto-load directories with commands.
+     *
+     * @return void
+     */
+    protected function commands()
+    {
+        $this->load(__DIR__.'/Commands');
     }
 }
