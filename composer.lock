@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "ab02587cf863328d507000673ef95fe6",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/art-institute-of-chicago/data-hub-foundation.git",
-                "reference": "f635e1a007a19bc8c1190d25851f347badc3c6d1"
+                "reference": "151b415f84d2b40511f8fa2d666ff049b5baa9f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/art-institute-of-chicago/data-hub-foundation/zipball/f635e1a007a19bc8c1190d25851f347badc3c6d1",
-                "reference": "f635e1a007a19bc8c1190d25851f347badc3c6d1",
+                "url": "https://api.github.com/repos/art-institute-of-chicago/data-hub-foundation/zipball/151b415f84d2b40511f8fa2d666ff049b5baa9f2",
+                "reference": "151b415f84d2b40511f8fa2d666ff049b5baa9f2",
                 "shasum": ""
             },
             "require": {
@@ -50,7 +50,7 @@
                 "source": "https://github.com/art-institute-of-chicago/data-hub-foundation/tree/master",
                 "issues": "https://github.com/art-institute-of-chicago/data-hub-foundation/issues"
             },
-            "time": "2019-04-08 21:32:21"
+            "time": "2019-04-29T21:01:16+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
