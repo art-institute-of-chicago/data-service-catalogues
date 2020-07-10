@@ -27,12 +27,10 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('import:pubs --redownload --quiet')
             ->dailyAt('23:' .(config('app.env') == 'production' ? '00' : '15'))
-            ->withoutOverlapping()
             ->sendOutputTo(storage_path('logs/import-last-run.log'));
 
         $schedule->command('match:artworks --quiet')
             ->weeklyOn(6, '03:' .(config('app.env') == 'production' ? '00' : '15'))
-            ->withoutOverlapping()
             ->sendOutputTo(storage_path('logs/match-last-run.log'));
 
     }
