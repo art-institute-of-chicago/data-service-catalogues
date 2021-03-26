@@ -9,9 +9,7 @@ class Publication extends BaseModel
 
     public function sections()
     {
-
         return $this->hasMany('App\Section', 'publication_id');
-
     }
 
     /**
@@ -32,7 +30,6 @@ class Publication extends BaseModel
      */
     public static function getPubCollection()
     {
-
         $pubs = [
             [
                 'site' => 'renoir',
@@ -97,15 +94,14 @@ class Publication extends BaseModel
         ];
 
         // Convert into Laravel Collection
-        $pubs = collect( $pubs );
+        $pubs = collect($pubs);
 
         // Convert the assoc. arrays into stdObj
-        $pubs->transform( function ($item, $key) {
+        $pubs->transform(function ($item, $key) {
             return (object) $item;
         });
 
         return $pubs;
-
     }
 
 }

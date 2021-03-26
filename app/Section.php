@@ -25,7 +25,6 @@ class Section extends BaseModel
      */
     protected $content;
 
-
     /**
      * Defines default order as `publication_id` descending, then `weight` ascending.
      * Uses the inline method for scope definition, rather than creating new classes.
@@ -35,7 +34,6 @@ class Section extends BaseModel
      * {@inheritdoc}
      */
     protected static function boot() {
-
         parent::boot();
 
         static::addGlobalScope('order-publication', function (Builder $builder) {
@@ -45,28 +43,21 @@ class Section extends BaseModel
         static::addGlobalScope('order-weight', function (Builder $builder) {
             $builder->orderBy('weight', 'asc');
         });
-
     }
 
     public function publication()
     {
-
         return $this->belongsTo('App\Publication');
-
     }
 
     public function parent()
     {
-
         return $this->belongsTo('App\Section', 'parent_id');
-
     }
 
     public function children()
     {
-
         return $this->hasMany('App\Section', 'parent_id');
-
     }
 
     /**
@@ -86,16 +77,12 @@ class Section extends BaseModel
      */
     public function getContent()
     {
-
-        if( !$this->content ) {
-
+        if(!$this->content) {
             $file = "{$this->publication->site}/{$this->publication->id}/sections/{$this->source_id}.xhtml";
-            $this->content = Storage::get( $file );
-
+            $this->content = Storage::get($file);
         }
 
         return $this->content;
-
     }
 
     /**
@@ -107,14 +94,12 @@ class Section extends BaseModel
      */
     public function getContentCrawler()
     {
-
         $content = $this->getContent();
 
         $crawler = new Crawler();
-        $crawler->addHtmlContent( $content, 'UTF-8' );
+        $crawler->addHtmlContent($content, 'UTF-8');
 
         return $crawler;
-
     }
 
     /**
@@ -123,17 +108,15 @@ class Section extends BaseModel
      * @param  \Symfony\Component\DomCrawler\Crawler $crawler
      * @return string
      */
-    public function getType( $crawler = null )
+    public function getType($crawler = null)
     {
-
         $crawler = $crawler ?? $this->getContentCrawler();
 
         $body = $crawler->filterXPath('html/body');
 
-        $type = explode( ' ', $body->attr('class') )[1];
+        $type = explode(' ', $body->attr('class'))[1];
 
         return $type;
-
     }
 
     /**
@@ -142,13 +125,11 @@ class Section extends BaseModel
      * @param  \Symfony\Component\DomCrawler\Crawler $crawler
      * @return boolean
      */
-    public function isArtwork( $crawler = null )
+    public function isArtwork($crawler = null)
     {
-
-        $type = $this->getType( $crawler );
+        $type = $this->getType($crawler);
 
         return $type === 'node-work-of-art';
-
     }
 
     /**
@@ -158,21 +139,18 @@ class Section extends BaseModel
      * @param  \Symfony\Component\DomCrawler\Crawler $crawler
      * @return string
      */
-    public function getTombstone( $crawler = null )
+    public function getTombstone($crawler = null)
     {
-
         $crawler = $crawler ?? $this->getContentCrawler();
 
         $crawler = $crawler->filterXPath("//section[@id='tombstone']");
 
         // Return if this doesn't have a tombstone
-        if( $crawler->count() < 1 )
-        {
+        if ($crawler->count() < 1) {
             return null;
         }
 
-        return $this->getPlaintext( $crawler );
-
+        return $this->getPlaintext($crawler);
     }
 
     /**
@@ -184,9 +162,8 @@ class Section extends BaseModel
      * @param  \Symfony\Component\DomCrawler\Crawler $crawler
      * @return string
      */
-    public function getMarkdown( $crawler = null )
+    public function getMarkdown($crawler = null)
     {
-
         $crawler = $crawler ?? $this->getContentCrawler()->filter('body');
 
         $html = $crawler->html();
@@ -198,15 +175,14 @@ class Section extends BaseModel
         $markdown_a = explode("\n", $markdown);
 
         // Remove leading spaces on each line
-        $markdown_a = array_map( function( $line ) {
-            return ltrim( $line );
+        $markdown_a = array_map(function ($line) {
+            return ltrim($line);
         }, $markdown_a);
 
         // Concatenate
         $markdown = implode("\n", $markdown_a);
 
         return $markdown;
-
     }
 
     /**
@@ -218,13 +194,12 @@ class Section extends BaseModel
      * @param  \Symfony\Component\DomCrawler\Crawler $crawler
      * @return string
      */
-    public function getPlaintext( $crawler = null )
+    public function getPlaintext($crawler = null)
     {
-
         $crawler = $crawler ?? $this->getContentCrawler()->filter('body');
 
         // Use HTMLPageDOM for these manipulations
-        $crawler = new HtmlPageCrawler( $crawler );
+        $crawler = new HtmlPageCrawler($crawler);
 
         // Remove non-text, non-markdown elements
         $crawler->filter('.footnote-reference')->remove();
@@ -260,7 +235,7 @@ class Section extends BaseModel
         // http://data-service-catalogues.dev/v1/sections/478250.txt
 
         // Use the Markdown processor to handle whitespace, etc.
-        $markdown = $this->getMarkdown( $crawler );
+        $markdown = $this->getMarkdown($crawler);
 
         // Prepare to remove Markdown artifacts
         $plaintext = $markdown;
@@ -270,11 +245,10 @@ class Section extends BaseModel
         $plaintext = str_replace('\]', ']', $plaintext);
 
         // Null out if empty
-        $plaintext = trim( $plaintext );
-        $plaintext = empty( $plaintext ) ? null : $plaintext;
+        $plaintext = trim($plaintext);
+        $plaintext = empty($plaintext) ? null : $plaintext;
 
         return $plaintext;
-
     }
 
     /**
@@ -285,17 +259,15 @@ class Section extends BaseModel
      */
     public function getAccession()
     {
-
         $tombstone = $this->getTombstone();
 
         // Try grepping the title, since it's more accurate
-        $accession = self::extractAccessionFromString( $this->title );
+        $accession = self::extractAccessionFromString($this->title);
 
         // Try grepping the tombstone, if there were no matches
-        $accession = $accession ?? self::extractAccessionFromString( $tombstone );
+        $accession = $accession ?? self::extractAccessionFromString($tombstone);
 
         return $accession;
-
     }
 
     /**
@@ -305,10 +277,9 @@ class Section extends BaseModel
      * @param string $input
      * @return string
      */
-    private static function extractAccessionFromString( $input = null ) {
-
-        if( !$input )
-        {
+    private static function extractAccessionFromString($input = null)
+    {
+        if (!$input) {
             return null;
         }
 
@@ -318,24 +289,21 @@ class Section extends BaseModel
         preg_match_all($pattern, $input, $matches);
 
         // For some reason, preg_match returns an array of empty strings for some inputs
-        $matches = array_filter($matches, function($item) { return !empty($item); });
+        $matches = array_filter($matches, function ($item) { return !empty($item); });
 
-        if( count( $matches ) < 1 )
-        {
+        if (count($matches) < 1) {
             return null;
         }
 
         // Focus on the last match (accessions tend to be towards the end of the line)
-        $matches = $matches[ count($matches) - 1 ];
+        $matches = $matches[count($matches) - 1];
 
         // For some reason, these are also blank sometimes
-        if( count( $matches ) < 1 )
-        {
+        if (count($matches) < 1) {
             return null;
         }
 
         return $matches[0];
-
     }
 
 }

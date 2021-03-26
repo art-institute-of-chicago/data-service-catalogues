@@ -19,18 +19,17 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
     {
 
         $schedule->command('import:pubs --redownload --quiet')
-            ->dailyAt('23:' .(config('app.env') == 'production' ? '00' : '15'))
+            ->dailyAt('23:' . (config('app.env') === 'production' ? '00' : '15'))
             ->sendOutputTo(storage_path('logs/import-last-run.log'));
 
         $schedule->command('match:artworks --quiet')
-            ->weeklyOn(6, '03:' .(config('app.env') == 'production' ? '00' : '15'))
+            ->weeklyOn(6, '03:' . (config('app.env') === 'production' ? '00' : '15'))
             ->sendOutputTo(storage_path('logs/match-last-run.log'));
 
     }
@@ -42,6 +41,6 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
     }
 }

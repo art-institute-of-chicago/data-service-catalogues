@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Console\Commands;
 
 use App\Section;
@@ -14,45 +15,40 @@ class CountArtworks extends AbstractCommand
 
     public function handle()
     {
-
         $sections = Section::all();
 
-        $artworks = $sections->filter( function( $section ) {
+        $artworks = $sections->filter(function ($section) {
             return $section->isArtwork();
         });
 
-        $tombstones = $artworks->filter( function( $artwork ) {
+        $tombstones = $artworks->filter(function ($artwork) {
             return $artwork->getTombstone();
         });
 
-        $accessions = $tombstones->filter( function( $artwork ) {
+        $accessions = $tombstones->filter(function ($artwork) {
             return $artwork->getAccession();
         });
 
-        $unparsed = $tombstones->diff( $accessions );
+        $unparsed = $tombstones->diff($accessions);
 
-        $matches = $accessions->filter( function( $artwork ) {
+        $matches = $accessions->filter(function ($artwork) {
             return $artwork->citi_id;
         });
 
-        $this->info( $sections->count() . ' sections in total.');
-        $this->info( $artworks->count() . ' of these are artworks.');
-        $this->info( $tombstones->count() . ' of artworks have tombstones.');
-        $this->info( $accessions->count() . ' of artworks with tombstones have parsable accessions.');
-        $this->info( $matches->count() . ' have been matched to artworks in CITI.');
+        $this->info($sections->count() . ' sections in total.');
+        $this->info($artworks->count() . ' of these are artworks.');
+        $this->info($tombstones->count() . ' of artworks have tombstones.');
+        $this->info($accessions->count() . ' of artworks with tombstones have parsable accessions.');
+        $this->info($matches->count() . ' have been matched to artworks in CITI.');
 
-        if( $this->option('unparsed') )
-        {
+        if($this->option('unparsed')) {
+            $this->warn("Here's the list of unparsable artworks:\n");
 
-            $this->warn( "Here's the list of unparsable artworks:\n" );
-
-            $unparsed->each( function( $artwork ) {
-                $this->warn( $artwork->id . ': ' . $artwork->title . "\n\n" );
-                $this->info( $artwork->getTombstone() . "\n" );
+            $unparsed->each(function ($artwork) {
+                $this->warn($artwork->id . ': ' . $artwork->title . "\n\n");
+                $this->info($artwork->getTombstone() . "\n");
             });
-
         }
-
     }
 
 }

@@ -13,7 +13,7 @@ abstract class AbstractCommand extends BaseCommand
      * @param object $pub
      * @return string
      */
-    protected function getPubPath( $pub )
+    protected function getPubPath($pub)
     {
         return $pub->site . '/' . $pub->id;
     }
@@ -24,7 +24,7 @@ abstract class AbstractCommand extends BaseCommand
      * @param object $pub
      * @return string
      */
-    protected function getPackageUrl( $pub )
+    protected function getPackageUrl($pub)
     {
         return 'https://publications.artic.edu/' . $pub->site . '/api/epub/' . $pub->id . '/package.opf';
     }
@@ -35,9 +35,9 @@ abstract class AbstractCommand extends BaseCommand
      * @param object $pub
      * @return string
      */
-    protected function getPackagePath( $pub )
+    protected function getPackagePath($pub)
     {
-        return $this->getPubPath( $pub ) . '/package.opf';
+        return $this->getPubPath($pub) . '/package.opf';
     }
 
     /**
@@ -46,7 +46,7 @@ abstract class AbstractCommand extends BaseCommand
      * @param object $pub
      * @return string
      */
-    protected function getNavUrl( $pub )
+    protected function getNavUrl($pub)
     {
         return 'https://publications.artic.edu/' . $pub->site . '/api/epub/' . $pub->id . '/nav.xhtml';
     }
@@ -57,28 +57,9 @@ abstract class AbstractCommand extends BaseCommand
      * @param object $pub
      * @return string
      */
-    protected function getNavPath( $pub )
+    protected function getNavPath($pub)
     {
-        return $this->getPubPath( $pub ) . '/nav.xhtml';
-    }
-
-    /**
-     * Calculate a unique integer based on two integers (cantor pairing).
-     */
-    public static function cantor_pair_calculate($x, $y) {
-        return (($x + $y) * ($x + $y + 1)) / 2 + $y;
-    }
-
-    /**
-     * Return the source integers from a cantor pair integer.
-     */
-    public static function cantor_pair_reverse($z) {
-        $t = floor((-1 + sqrt(1 + 8 * $z))/2);
-        $x = $t * ($t + 3) / 2 - $z;
-        $y = $z - $t * ($t + 1) / 2;
-        return array($x, $y);
+        return $this->getPubPath($pub) . '/nav.xhtml';
     }
 
 }
-
-
