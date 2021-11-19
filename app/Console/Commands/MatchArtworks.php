@@ -172,20 +172,36 @@ class MatchArtworks extends AbstractCommand
     }
 
     // @TODO: Use https://github.com/FriendsOfPHP/Goutte
-    // https://stackoverflow.com/questions/5647461/how-do-i-send-a-post-request-with-php
     private function post($url, $data)
     {
-        // use key 'http' even if you send the request to https://...
-        $options = [
-            'http' => [
-                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method' => 'POST',
-                'content' => http_build_query($data),
-            ],
-        ];
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_PROXY, env('CURL_PROXY'));
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-        $context = stream_context_create($options);
-        $result = file_get_contents($url, false, $context);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+        // WEB-874: If connection or response take longer than 30 seconds, give up
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+        $retries = 3;
+
+        do {
+            $result = curl_exec($ch);
+            $retries--;
+        } while (curl_errno($ch) === 28 && $retries > 0);
+
+        if (curl_errno($ch)) {
+            throw new \Exception(curl_error($ch));
+        }
+
+        curl_close($ch);
 
         return $result;
     }
