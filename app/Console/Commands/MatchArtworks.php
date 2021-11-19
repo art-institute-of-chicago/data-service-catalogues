@@ -70,7 +70,7 @@ class MatchArtworks extends AbstractCommand
     public function match($item)
     {
         // Throttle API requests...
-        sleep(1);
+        // sleep(1);
 
         $result = $this->search($item->accession);
 
