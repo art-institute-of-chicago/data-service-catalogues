@@ -48,20 +48,32 @@ class Publication extends BaseModel
                 'alias' => 'gauguinart',
                 'id' => '141096',
             ],
-            // TODO: Ivan Albright
+            [
+                'site' => 'albright',
+                'alias' => 'paintings',
+                'id' => '80',
+            ],
             [
                 'site' => 'ensor',
                 'alias' => 'temptationstanthony',
                 'id' => '226',
             ],
-            // TODO: Lithographs of Whistler
+            [
+                'site' => 'digitalwhistler',
+                'alias' => 'lithographs',
+                'id' => '351',
+            ],
             // Malangatana is not an OSCI Toolkit publication
             [
                 'site' => 'manet',
                 'alias' => 'manetart',
                 'id' => '140019',
             ],
-            // TODO: Matisse
+            [
+                'site' => 'matisse',
+                'alias' => 'works',
+                'id' => '23',
+            ],
             [
                 'site' => 'modernseries2',
                 'alias' => 'go',
@@ -93,11 +105,10 @@ class Publication extends BaseModel
                 'id' => '480',
             ],
             [
-                'site' => 'whistler',
-                'alias' => 'linkedvisions',
-                'id' => '406',
+                'site' => 'whistlerart',
+                'alias' => 'paintingsanddrawings',
+                'id' => '64',
             ],
-            // TODO: Whistler Paintings and Drawings
         ];
 
         // Convert into Laravel Collection
