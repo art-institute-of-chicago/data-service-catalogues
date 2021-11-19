@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\DomCrawler\Crawler;
 
+use App\Helpers\Cantor;
 use App\Publication;
 use App\Section;
 
@@ -90,7 +91,7 @@ class ImportPublications extends AbstractCommand
         $items->each(function ($item) use (&$pub, &$weight) {
 
             $source_id = (int) $item->attr('data-section_id');
-            $cantor_id = self::cantor_pair_calculate($pub->id, $source_id);
+            $cantor_id = Cantor::calculate($pub->id, $source_id);
 
             $url = $item->attr('href');
 
@@ -128,7 +129,7 @@ class ImportPublications extends AbstractCommand
                 $parent_id = $parent->filterXPath('li/a')->attr('data-section_id');
                 $parent_id = (int) $parent_id;
 
-                $parent_id = self::cantor_pair_calculate($pub->id, $parent_id);
+                $parent_id = Cantor::calculate($pub->id, $parent_id);
             } else {
                 $parent_id = null;
             }
