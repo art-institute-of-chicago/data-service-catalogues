@@ -26,35 +26,17 @@ class Publication extends BaseModel
      * Returns necessary config for importing publications. Edit this method to target specific pubs for processing.
      * Publication list has to be hardcoded to avoid importing test publications. Each pub is an object.
      *
+     * WEB-964: Order this list alphabetically.
+     *
      * @return \Illuminate\Support\Collection
      */
     public static function getPubCollection()
     {
         $pubs = [
             [
-                'site' => 'renoir',
-                'alias' => 'paintingsanddrawings',
-                'id' => '135446',
-            ],
-            [
-                'site' => 'monet',
-                'alias' => 'paintingsanddrawings',
-                'id' => '135466',
-            ],
-            [
-                'site' => 'ensor',
-                'alias' => 'temptationstanthony',
-                'id' => '226',
-            ],
-            [
-                'site' => 'pissarro',
-                'alias' => 'paintingsandpaper',
-                'id' => '7',
-            ],
-            [
-                'site' => 'whistler',
-                'alias' => 'linkedvisions',
-                'id' => '406',
+                'site' => 'americansilver',
+                'alias' => 'collection',
+                'id' => '2',
             ],
             [
                 'site' => 'caillebotte',
@@ -66,15 +48,44 @@ class Publication extends BaseModel
                 'alias' => 'gauguinart',
                 'id' => '141096',
             ],
+            // TODO: Ivan Albright
+            [
+                'site' => 'ensor',
+                'alias' => 'temptationstanthony',
+                'id' => '226',
+            ],
+            // TODO: Lithographs of Whistler
+            // Malangatana is not an OSCI Toolkit publication
+            [
+                'site' => 'manet',
+                'alias' => 'manetart',
+                'id' => '140019',
+            ],
+            // TODO: Matisse
+            [
+                'site' => 'modernseries2',
+                'alias' => 'go',
+                'id' => '34',
+            ],
             [
                 'site' => 'modernseries',
                 'alias' => 'shatterrupturebreak',
                 'id' => '12',
             ],
             [
-                'site' => 'modernseries2',
-                'alias' => 'go',
-                'id' => '34',
+                'site' => 'monet',
+                'alias' => 'paintingsanddrawings',
+                'id' => '135466',
+            ],
+            [
+                'site' => 'pissarro',
+                'alias' => 'paintingsandpaper',
+                'id' => '7',
+            ],
+            [
+                'site' => 'renoir',
+                'alias' => 'paintingsanddrawings',
+                'id' => '135446',
             ],
             [
                 'site' => 'roman',
@@ -82,15 +93,11 @@ class Publication extends BaseModel
                 'id' => '480',
             ],
             [
-                'site' => 'manet',
-                'alias' => 'manetart',
-                'id' => '140019',
+                'site' => 'whistler',
+                'alias' => 'linkedvisions',
+                'id' => '406',
             ],
-            [
-                'site' => 'americansilver',
-                'alias' => 'collection',
-                'id' => '2',
-            ],
+            // TODO: Whistler Paintings and Drawings
         ];
 
         // Convert into Laravel Collection
