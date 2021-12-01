@@ -141,9 +141,33 @@ class Section extends BaseModel
      */
     public function getTombstone($crawler = null)
     {
+        return $this->getSection('tombstone', $crawler);
+    }
+
+    /**
+     * Returns Markdown representation of the tombstone section.
+     * This only works for sections that were created with the "Work of Art" content type.
+     *
+     * @param  \Symfony\Component\DomCrawler\Crawler $crawler
+     * @return string
+     */
+    private function getFigures($crawler = null)
+    {
+        return $this->getSection('figures', $crawler);
+    }
+
+    /**
+     * Returns Markdown representation of a section.
+     *
+     * @param  string $sectionId
+     * @param  \Symfony\Component\DomCrawler\Crawler $crawler
+     * @return string
+     */
+    private function getSection($sectionId, $crawler = null)
+    {
         $crawler = $crawler ?? $this->getContentCrawler();
 
-        $crawler = $crawler->filterXPath("//section[@id='tombstone']");
+        $crawler = $crawler->filterXPath("//section[@id='" . $sectionId . "']");
 
         // Return if this doesn't have a tombstone
         if ($crawler->count() < 1) {
@@ -260,12 +284,16 @@ class Section extends BaseModel
     public function getAccession()
     {
         $tombstone = $this->getTombstone();
+        $figures = $this->getFigures();
 
         // Try grepping the title, since it's more accurate
         $accession = self::extractAccessionFromString($this->title);
 
         // Try grepping the tombstone, if there were no matches
         $accession = $accession ?? self::extractAccessionFromString($tombstone);
+
+        // API-180: Try grepping the figure captions
+        $accession = $accession ?? self::extractAccessionFromString($figures, false);
 
         return $accession;
     }
@@ -277,7 +305,7 @@ class Section extends BaseModel
      * @param string $input
      * @return string
      */
-    private static function extractAccessionFromString($input = null)
+    private static function extractAccessionFromString($input = null, $findLast = true)
     {
         if (!$input) {
             return null;
@@ -296,7 +324,8 @@ class Section extends BaseModel
         }
 
         // Focus on the last match (accessions tend to be towards the end of the line)
-        $matches = $matches[count($matches) - 1];
+        // API-180: ...except when searching through figures, find the first match
+        $matches = $matches[($findLast ? (count($matches) - 1) : 0)];
 
         // For some reason, these are also blank sometimes
         if (count($matches) < 1) {
