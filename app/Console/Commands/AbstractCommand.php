@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\DomCrawler\Crawler;
+
 use Aic\Hub\Foundation\AbstractCommand as BaseCommand;
 
 abstract class AbstractCommand extends BaseCommand
@@ -62,4 +65,23 @@ abstract class AbstractCommand extends BaseCommand
         return $this->getPubPath($pub) . '/nav.xhtml';
     }
 
+    protected function getSectionPath($pub, $sectionId)
+    {
+        return $this->getPubPath($pub) . "/sections/{$sectionId}.xhtml";
+    }
+
+    protected function getFigurePath($pub, $figureId)
+    {
+        return $this->getPubPath($pub) . "/figures/{$figureId}.xhtml";
+    }
+
+    protected function getCrawler($path)
+    {
+        $contents = Storage::get($path);
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($contents, 'UTF-8');
+
+        return $crawler;
+    }
 }
